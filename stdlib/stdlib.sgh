@@ -1,6 +1,0 @@
-
-extern void* malloc(int);
-
-extern void free(void*);
-
-extern int printf(const char* format, ... );

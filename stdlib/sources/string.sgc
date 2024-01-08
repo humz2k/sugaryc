@@ -1,0 +1,14 @@
+#include <stdlib.sgh>
+#include <string.sgh>
+
+extern char *strcat(char *destination, const char *source);
+extern char *strcpy(char *dest, const char *src);
+extern int strlen(const char *str);
+
+string __add__(string left, string right){
+    int sz = strlen(left) + strlen(right) + 1;
+    char* out = (char*)GC_malloc(sizeof(char) * sz);
+    strcpy(out,left);
+    strcat(out,right);
+    return out;
+}

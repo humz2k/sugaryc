@@ -1,0 +1,8 @@
+
+extern void* malloc(int);
+
+extern void free(void*);
+
+extern int printf(const char* format, ... );
+
+extern void* GC_malloc(int);

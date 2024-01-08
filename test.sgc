@@ -1,31 +1,8 @@
 #include <stdlib.sgh>
-
-struct int_array{
-    int* raw;
-};
-
-typedef struct int_array* IntArray;
-
-IntArray make_IntArray(int size){
-    IntArray out = (IntArray)malloc(sizeof(struct int_array));
-    out->raw = (int*)malloc(sizeof(int) * size);
-    return out;
-}
-
-void del(IntArray arr){
-    free(arr->raw);
-    free(arr);
-}
-
-int* __index__(IntArray arr, int idx1, int idx2){
-    return &arr->raw[idx1];
-}
+#include <string.sgh>
 
 int main(){
-    IntArray arr = make_IntArray(10);
-    arr[1,0] = 5;
-    arr[1,0]++;
-    printf("%d\n",arr[1,0]);
-    arr.del();
+    string a = "Hello," + " World!";
+    printf("%s\n",a);
     return 0;
 }

@@ -9,7 +9,7 @@ import argparse
 def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, echo = False):
     ast = parse_file(inp, use_cpp=True,
         cpp_path='cpp',
-        cpp_args=[r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"stdlib")] + includes)
+        cpp_args=[r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"include")] + includes)
     
     generator = c_generator.CGenerator()
 
@@ -49,6 +49,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     to_compile = [i for i in args.files if i.endswith(".sgc")]
     to_link = [i for i in args.files if not i.endswith(".sgc")]
+    to_link.append(os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"ext/bdwgc/libgc.a"))
+    to_link.append(os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"stdlib/libsgc.a"))
     includes = []
     link_dir = []
     links = []
