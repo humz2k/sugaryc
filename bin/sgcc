@@ -7,7 +7,7 @@ from pycparser import c_generator, parse_file
 import argparse
 
 def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, echo = False):
-    ast = parse_file(sys.argv[1], use_cpp=True,
+    ast = parse_file(inp, use_cpp=True,
         cpp_path='cpp',
         cpp_args=[r'-Istdlib'] + includes)
     
@@ -65,18 +65,23 @@ if __name__ == "__main__":
     except:
         pass
 
-    intermediate_outputs = [i.split(".")[0] + "__tmp.o" for i in to_compile]
-    
-    for i,j in zip(to_compile,intermediate_outputs):
-        compile_file(i,j,includes,O = args.O,cxx = args.cxx,keep_temp = args.save_temps, echo = args.echo)
+    if (args.c):
+        compile_file(to_compile[0],args.o,includes,O = args.O,cxx = args.cxx,keep_temp = args.save_temps, echo = args.echo)
 
-    link_command = args.cxx + " -o " + args.o + " -O" + str(args.O) + " " + " ".join(intermediate_outputs + to_link) + " " + " ".join(includes + link_dir + links)
+    else:
 
-    if (args.echo):
-        print(link_command)
+        intermediate_outputs = [i.split(".")[0] + "__tmp.o" for i in to_compile]
+        
+        for i,j in zip(to_compile,intermediate_outputs):
+            compile_file(i,j,includes,O = args.O,cxx = args.cxx,keep_temp = args.save_temps, echo = args.echo)
 
-    os.system(link_command)
+        link_command = args.cxx + " -o " + args.o + " -O" + str(args.O) + " " + " ".join(intermediate_outputs + to_link) + " " + " ".join(includes + link_dir + links)
 
-    for i in intermediate_outputs:
-        os.remove(i)
+        if (args.echo):
+            print(link_command)
+
+        os.system(link_command)
+
+        for i in intermediate_outputs:
+            os.remove(i)
     
