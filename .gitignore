@@ -154,3 +154,5 @@ cython_debug/
 **.o
 
 **.a
+
+.vscode

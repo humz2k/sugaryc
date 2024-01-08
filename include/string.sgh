@@ -1,3 +1,5 @@
 typedef const char* string;
 
 string __add__(string left, string right);
+
+string __mul__(string left, int right);
