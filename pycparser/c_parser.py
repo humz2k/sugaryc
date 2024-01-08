@@ -14,6 +14,14 @@ from .plyparser import PLYParser, ParseError, parameterized, template
 from .ast_transforms import fix_switch_cases, fix_atomic_specifiers
 
 
+DUNDER_METHODS = {
+    "+": "__add__",
+    "-": "__sub__",
+    "*": "__mul__",
+    "/": "__div__"
+}
+
+
 @template
 class CParser(PLYParser):
     def __init__(
@@ -1707,10 +1715,17 @@ class CParser(PLYParser):
                                 | binary_expression LAND binary_expression
                                 | binary_expression LOR binary_expression
         """
+        global DUNDER_METHODS
         if len(p) == 2:
             p[0] = p[1]
         else:
-            p[0] = c_ast.BinaryOp(p[2], p[1], p[3], p[1].coord)
+            #print("BINOP",p[2])
+            if (p[2] in DUNDER_METHODS):
+                func_name = c_ast.ID(DUNDER_METHODS[p[2]], self._token_coord(p, 2))
+                p[0] = c_ast.FuncCall(func_name, c_ast.ExprList([p[1],p[3]], p[1].coord), p[1].coord)
+                p[0].sugared = True
+            else:
+                p[0] = c_ast.BinaryOp(p[2], p[1], p[3], p[1].coord)
 
     def p_cast_expression_1(self, p):
         """ cast_expression : unary_expression """
@@ -1855,8 +1870,6 @@ class CParser(PLYParser):
 
     def p_identifier(self, p):
         """ identifier  : ID """
-        #if (p[1] == "__add__"):
-        #    p[1] = "operator +"
         p[0] = c_ast.ID(p[1], self._token_coord(p, 1))
 
     def p_constant_1(self, p):

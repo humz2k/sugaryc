@@ -21,7 +21,13 @@ if __name__ == "__main__":
 
     temp_file = "__temp__.cpp"
 
+    out = generator.visit(ast)
+
+    #out = out.replace("__add__","operator +")
+    with open("ops.hpp","r") as ops:
+        out = ops.read() + out
+
     with open(temp_file,"w") as f:
-        f.write(generator.visit(ast))
+        f.write(out)
     os.system("g++ " + temp_file + " -o temp.o")
     
