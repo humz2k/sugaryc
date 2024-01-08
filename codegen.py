@@ -1,68 +1,70 @@
 from pycparser import c_parser, c_generator, c_ast
 from llvmlite import ir
 
-class GlobalState:
-    def __init__(self):
-        self.struct_decls = {}
-        self.typedefs = {}
+typedefs = {}
+functions = {}
 
-    def add_struct_decl(self,name,decls):
-        assert(name not in self.struct_decls)
-        self.struct_decls[name] = decls
-    
-    def get_struct_decl(self,name):
-        assert(name in self.struct_decls)
-        return self.struct_decls[name]
-        
-    def add_typedef(self,name,typ):
-        assert(not name in self.typedefs)
-        self.typedefs[name] = typ
+def type2string(typ):
+    if (type(typ) == c_ast.TypeDecl):
+        return type2string(typ.type)
+    if (type(typ) == c_ast.PtrDecl):
+        return type2string(typ.type) + "_ptr"
+    if (type(typ) == c_ast.Struct):
+        return "struct_" + typ.name
+    if (type(typ) == c_ast.IdentifierType):
+        return "_".join(typ.names)
+    print(typ)
+    print("NOT IMPLEMENTED",type(typ))
+    exit()
 
-    def get_typedef(self,name):
-        assert(name in self.typedefs)
-        return self.typedefs[name]
+class FunctionMangler(c_ast.NodeVisitor):
+    def visit_FuncDecl(self,node : c_ast.FuncDecl):
+        global functions
+        base_name = node.type.declname
+        if (base_name == "main"):
+            return
+        param_list = node.args.params
+        for i in param_list:
+            base_name += "__" + type2string(resolve_type_def(i.type))
+        node.type.declname = base_name
+        functions[base_name] = node
 
-state = GlobalState()
+def resolve_type_def(node):
+    global typedefs
+    if (type(node) == c_ast.IdentifierType):
+        try:
+            return typedefs[node.names[-1]]
+        except:
+            return node
+    try:
+        node.type = resolve_type_def(node.type)
+    except:
+        pass
+    return node
 
-class FindStructDecls(c_ast.NodeVisitor):
-    def visit_Struct(self, node : c_ast.Struct):
-        global state
-        if (not node.decls is None):
-            state.add_struct_decl(node.name, node.decls)
-        self.generic_visit(node)
+class TypeDefCacher(c_ast.NodeVisitor):
+    def visit_Typedef(self, node):
+        global typedefs
+        typedefs[node.name] = resolve_type_def(node.type)
 
-class ResolveStructDecls(c_ast.NodeVisitor):
-    def visit_Struct(self, node : c_ast.Struct):
-        global state
-        if node.decls is None:
-            try:
-                node.decls = state.get_struct_decl(node.name)
-            except:
-                pass
-        self.generic_visit(node)
-
-class ResolveTypeDefs(c_ast.NodeVisitor):
-    def visit_Typedef(self, node : c_ast.Typedef):
-        global state
-
-    def visit_Decl(self, node : c_ast.Decl):
-        global state
-        if type(node.type) == c_ast.IdentifierType:
-            print(node)
-
-class PrintStructDecls(c_ast.NodeVisitor):
-    def visit_Struct(self, node : c_ast.Struct):
-        global state
-        #print(node)
-    
+    def visit_TypeDecl(self, node):
+        node.type = resolve_type_def(node.type)
 
 text = """
 
 struct test;
 
-typedef struct test TEST;
+typedef int TEST;
 
-TEST yes;
+const TEST* yes;
+
+int test(const TEST in){
+    return 0;
+}
+
+int main(){
+    test(5);
+}
 
 """
 
@@ -70,9 +72,13 @@ TEST yes;
 parser = c_parser.CParser()
 ast = parser.parse(text)
 
-FindStructDecls().visit(ast)
-ResolveStructDecls().visit(ast)
-ResolveTypeDefs().visit(ast)
-#PrintStructDecls().visit(ast)
+#ast.show(offset = 2)
 
-#ast.show(offset=2)
+v = TypeDefCacher()
+v.visit(ast)
+
+v = FunctionMangler()
+v.visit(ast)
+
+generator = c_generator.CGenerator()
+print(generator.visit(ast))
