@@ -1,12 +1,15 @@
+#!/usr/bin/env python3
+
 import sys
 import os
 sys.path = [os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))] + sys.path
 from pycparser import c_generator, parse_file
+import argparse
 
-def compile_file(inp,outfile,*args):
+def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, echo = False):
     ast = parse_file(sys.argv[1], use_cpp=True,
         cpp_path='cpp',
-        cpp_args=r'-Istdlib' + " ".join(args))
+        cpp_args=[r'-Istdlib'] + includes)
     
     generator = c_generator.CGenerator()
 
@@ -15,39 +18,65 @@ def compile_file(inp,outfile,*args):
     with open(os.path.join(os.path.dirname( __file__ ),"ops.hpp"),"r") as ops:
         out = ops.read() + out
 
-    with open(outfile.split(".")[0] + "__sgc_tmp.cpp","w") as f:
-        f.write(out)
-    
-
-
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        #with open(sys.argv[1],"r") as f:
-        #    text = f.read()
-        pass
-    else:
-        print("Please provide a filename as argument")
-        exit(1)
-
-    compile_file(sys.argv[1],"temp.o")
-
-    #parser = c_parser.CParser()
-    #ast = parser.parse(text)
-    '''ast = parse_file(sys.argv[1], use_cpp=True,
-        cpp_path='cpp',
-        cpp_args=r'-Istdlib')
-
-    generator = c_generator.CGenerator()
-
-    temp_file = "__temp__.cpp"
-
-    out = generator.visit(ast)
-
-    with open("ops.hpp","r") as ops:
-        out = ops.read() + out
+    temp_file = outfile.split(".")[0] + "__sgc_tmp.cpp"
 
     with open(temp_file,"w") as f:
         f.write(out)
-    os.system("g++ " + temp_file + " -o temp.o" + " -Wno-c++11-extensions")
-    '''
+
+    command = cxx + " -O" + str(O) + " " + " -c " + temp_file + " -o " + outfile + " -Wno-c++11-extensions"
+
+    if (echo):
+        print(command)
+
+    os.system(command)
+
+    if (not keep_temp):
+        os.remove(temp_file)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Compile .sgc")
+    parser.add_argument('files',metavar="<source>",type=str, nargs='+')
+    parser.add_argument('-o',metavar="<output>",type=str,default="a.out")
+    parser.add_argument('-cxx',metavar="<cxx>",type=str,default="g++")
+    parser.add_argument('-c',action='store_true',default=False)
+    parser.add_argument('-O',metavar="<opt>",type=int,default=3)
+    parser.add_argument('--echo',action='store_true',default=False)
+    parser.add_argument('-I',metavar="<I>",type=str,nargs='+')
+    parser.add_argument('-L',metavar="<L>",type=str,nargs='+')
+    parser.add_argument('-l',metavar="<l>",type=str,nargs='+')
+    parser.add_argument('--save-temps','-S',action='store_true',default=False)
+
+    args = parser.parse_args()
+    to_compile = [i for i in args.files if i.endswith(".sgc")]
+    to_link = [i for i in args.files if not i.endswith(".sgc")]
+    includes = []
+    link_dir = []
+    links = []
+    try:
+        includes = ["-I" + i for i in args.I]
+    except:
+        pass
+    try:
+        link_dir = ["-L" + i for i in args.L]
+    except:
+        pass
+    try:
+        links = ["-l" + i for i in args.l]
+    except:
+        pass
+
+    intermediate_outputs = [i.split(".")[0] + "__tmp.o" for i in to_compile]
+    
+    for i,j in zip(to_compile,intermediate_outputs):
+        compile_file(i,j,includes,O = args.O,cxx = args.cxx,keep_temp = args.save_temps, echo = args.echo)
+
+    link_command = args.cxx + " -o " + args.o + " -O" + str(args.O) + " " + " ".join(intermediate_outputs + to_link) + " " + " ".join(includes + link_dir + links)
+
+    if (args.echo):
+        print(link_command)
+
+    os.system(link_command)
+
+    for i in intermediate_outputs:
+        os.remove(i)
     
