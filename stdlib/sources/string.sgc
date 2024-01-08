@@ -20,3 +20,7 @@ string __mul__(string left, int right){
     }
     return out;
 }
+
+string __mul__(int left, string right){
+    return right * left;
+}

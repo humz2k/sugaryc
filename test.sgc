@@ -2,7 +2,7 @@
 #include <string.sgh>
 
 int main(){
-    string a = "Hello," + " World" + "!" * 5;
+    string a = "Hello," + " World" + "!" * 5 + 3 * "!";
     printf("%s\n",a);
     return 0;
 }
