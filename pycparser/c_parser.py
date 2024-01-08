@@ -1673,7 +1673,19 @@ class CParser(PLYParser):
         if len(p) == 2:
             p[0] = p[1]
         else:
-            p[0] = c_ast.Assignment(p[2], p[1], p[3], p[1].coord)
+            #if (p[2] == "="):
+            #    p[0] = c_ast.Assignment(p[2], p[1], p[3], p[1].coord)
+            #    return
+            
+            op = p[2][:-1]
+            if (op in DUNDER_METHODS):
+                func_name = c_ast.ID(DUNDER_METHODS[op], self._token_coord(p, 2))
+                call = c_ast.FuncCall(func_name, c_ast.ExprList([p[1],p[3]], p[1].coord), p[1].coord)
+                call.sugared = True
+                p[0] = c_ast.Assignment("=", p[1], call, p[1].coord)
+            else:
+                p[0] = c_ast.Assignment(p[2], p[1], p[3], p[1].coord)
+            #exit()
 
     # K&R2 defines these as many separate rules, to encode
     # precedence and associativity. Why work hard ? I'll just use

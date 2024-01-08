@@ -16,7 +16,7 @@ string __add__(string left, string right){
 string __mul__(string left, int right){
     string out = "";
     for (int i = 0; i < right; i++){
-        out = out + left;
+        out += left;
     }
     return out;
 }
