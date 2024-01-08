@@ -855,6 +855,8 @@ class CParser(PLYParser):
                                     | TYPEDEF
                                     | _THREAD_LOCAL
         """
+        if(p[1] == "extern"):
+            p[1] = 'extern "C"'
         p[0] = p[1]
 
     def p_function_specifier(self, p):
@@ -1853,6 +1855,8 @@ class CParser(PLYParser):
 
     def p_identifier(self, p):
         """ identifier  : ID """
+        #if (p[1] == "__add__"):
+        #    p[1] = "operator +"
         p[0] = c_ast.ID(p[1], self._token_coord(p, 1))
 
     def p_constant_1(self, p):

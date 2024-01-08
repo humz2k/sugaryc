@@ -1,42 +1,27 @@
-from pycparser import c_parser, c_generator, c_ast
-from mangler import *
-from typedef_cacher import *
-from llvmlite import ir
+from pycparser import c_parser, c_generator, parse_file
+import sys
+import os
 
-text = """
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        #with open(sys.argv[1],"r") as f:
+        #    text = f.read()
+        pass
+    else:
+        print("Please provide a filename as argument")
+        exit(1)
 
-int test(void){
-    const int a = 1;
-    return 0;
-}
+    #parser = c_parser.CParser()
+    #ast = parser.parse(text)
+    ast = parse_file(sys.argv[1], use_cpp=True,
+        cpp_path='cpp',
+        cpp_args=r'-Istdlib')
 
-"""
+    generator = c_generator.CGenerator()
 
-class C2LLVM(c_ast.NodeVisitor):
-    def visit_IdentifierType(self, node : c_ast.IdentifierType):
-        if (tuple(node.names) == ('int',)):
-            return ir.IntType(32)
-        if (tuple(node.names) == ('short', 'int',) or (tuple(node.names) == ('short'))):
-            return ir.IntType(16)
-        if (type(node.names) == ('void')):
-            return ir.VoidType()
-        
-    def visit_TypeDecl()
-        
-    def visit_FuncDecl(self, node : c_ast.FuncDecl):
-        print(node)
+    temp_file = "__temp__.cpp"
 
-
-parser = c_parser.CParser()
-ast = parser.parse(text)
-
-v = TypeDefCacher()
-v.visit(ast)
-
-v = C2LLVM()
-v.visit(ast)
-
-#ast.show(offset = 2)
-
-#generator = c_generator.CGenerator()
-#print(generator.visit(ast))
+    with open(temp_file,"w") as f:
+        f.write(generator.visit(ast))
+    os.system("g++ " + temp_file + " -o temp.o")
+    
