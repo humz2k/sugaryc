@@ -90,12 +90,15 @@ template <typename T, typename T2>
 static inline typename std::common_type<T, T2>::type __neq__(T t, T2 t2) {
     return t != t2;
 }
-extern "C" void *malloc(int);
-extern "C" void free(void *);
-extern "C" int printf(const char *format, ...);
-int main()
-{
-  printf("%f\n", __sub__(__add__(1.0, __div__(__mul__(1.0, 5), 2)), 2));
-  return 0;
+
+template <typename T>
+static inline T* __index__(T* t, int idx) {
+    return &t[idx];
 }
 
+#define __index_wrapper__(...) (*__index__(__VA_ARGS__))
+
+/*template <typename T, typename... Args>
+static inline auto __index_wrapper__(T* t, Args... args) -> decltype(*__index__(t,args...)) {
+    return *__index__(t,args...);
+}*/

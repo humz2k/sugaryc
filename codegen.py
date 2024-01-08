@@ -24,10 +24,10 @@ if __name__ == "__main__":
     out = generator.visit(ast)
 
     #out = out.replace("__add__","operator +")
-    with open("ops.hpp","r") as ops:
+    with open("bin/ops.hpp","r") as ops:
         out = ops.read() + out
 
     with open(temp_file,"w") as f:
         f.write(out)
-    os.system("g++ " + temp_file + " -o temp.o")
+    os.system("g++ " + temp_file + " -o temp.o" + " -Wno-c++11-extensions")
     
