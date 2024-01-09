@@ -13,4 +13,6 @@ int len(int_tuple t);
 
 const char* __str__(int_tuple t);
 
+#define literal_int_tuple(...) (make_int_tuple((int[]){__VA_ARGS__},sizeof((int[]){__VA_ARGS__})/sizeof(int)))
+
 #endif

@@ -347,6 +347,7 @@ class CParser(PLYParser):
         if not typename:
             # Functions default to returning int
             #
+           #print(decl)
             if not isinstance(decl.type, c_ast.FuncDecl):
                 self._parse_error(
                         "Missing type in declaration", decl.coord)
@@ -870,8 +871,7 @@ class CParser(PLYParser):
         p[0] = self._add_declaration_specifier(p[1], p[2], 'alignment', append=True)
 
     def p_storage_class_specifier(self, p):
-        """ storage_class_specifier : AUTO
-                                    | REGISTER
+        """ storage_class_specifier : REGISTER
                                     | STATIC
                                     | EXTERN
                                     | TYPEDEF
@@ -900,6 +900,7 @@ class CParser(PLYParser):
                                       | SIGNED
                                       | UNSIGNED
                                       | __INT128
+                                      | AUTO
         """
         p[0] = c_ast.IdentifierType([p[1]], coord=self._token_coord(p, 1))
 

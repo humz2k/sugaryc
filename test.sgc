@@ -6,5 +6,7 @@
 int main(){
     int_array a = make_int_array(2,5);
     println(a.dims(),a.dims()[0],a.dims()[1]);
+    auto b = literal_int_tuple(1,2,3,4,5,6);
+    println(b);
     return 0;
 }
