@@ -47,3 +47,25 @@ int ndims(float_array arr){
 int ndims(double_array arr){
     return _get_ndims_double_array(arr);
 }
+
+
+extern int* _get_dims_int_array(int_array arr);
+extern int* _get_dims_long_int_array(long_array arr);
+extern int* _get_dims_float_array(float_array arr);
+extern int* _get_dims_double_array(double_array arr);
+
+int_tuple dims(int_array arr){
+    return make_int_tuple(_get_dims_int_array(arr),arr.ndims());
+}
+
+int_tuple dims(long_array arr){
+    return make_int_tuple(_get_dims_long_int_array(arr),arr.ndims());
+}
+
+int_tuple dims(float_array arr){
+    return make_int_tuple(_get_dims_float_array(arr),arr.ndims());
+}
+
+int_tuple dims(double_array arr){
+    return make_int_tuple(_get_dims_double_array(arr),arr.ndims());
+}

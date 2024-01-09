@@ -1,0 +1,38 @@
+#include <stdlib.sgh>
+#include <int_tuple.sgh>
+#include <string.sgh>
+
+struct _int_tuple{
+    int* raw;
+    int length;
+};
+
+typedef struct _int_tuple* int_tuple;
+
+int_tuple make_int_tuple(int* raw, int length){
+    int_tuple out = (int_tuple)GC_malloc(sizeof(struct _int_tuple));
+    out->length = length;
+    out->raw = (int*)GC_malloc(sizeof(int) * length);
+    for (int i = 0; i < length; i++){
+        out->raw[i] = raw[i];
+    }
+    return out;
+}
+
+const int* __index__(int_tuple t, int* idx, int nidx){
+    return &t->raw[idx[0]];
+}
+
+int len(int_tuple t){
+    return t->length;
+}
+
+string __str__(int_tuple t){
+    string out = "(";
+    for (int i = 0; i < t.len() - 1; i++){
+        out += t[i].to_str() + ", ";
+    }
+    out += t[t.len()-1].to_str() + ")";
+    return out;
+}
+

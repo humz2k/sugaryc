@@ -1,0 +1,16 @@
+#ifndef _INT_TUPLE_SGH_
+#define _INT_TUPLE_SGH_
+
+struct _int_tuple;
+
+typedef struct _int_tuple* int_tuple;
+
+int_tuple make_int_tuple(int* raw, int length);
+
+const int* __index__(int_tuple t, int* idx, int nidx);
+
+int len(int_tuple t);
+
+const char* __str__(int_tuple t);
+
+#endif

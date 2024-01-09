@@ -1,6 +1,8 @@
 #ifndef _NDARRAY_SGH_
 #define _NDARRAY_SGH_
 
+#include <int_tuple.sgh>
+
 struct _int_array;
 struct _long_int_array;
 struct _float_array;
@@ -39,5 +41,14 @@ int ndims(long_array arr);
 int ndims(float_array arr);
 
 int ndims(double_array arr);
+
+int_tuple dims(int_array arr);
+
+int_tuple dims(long_array arr);
+
+int_tuple dims(float_array arr);
+
+int_tuple dims(double_array arr);
+
 
 #endif

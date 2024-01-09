@@ -96,3 +96,19 @@ extern "C" int _get_ndims_float_array(struct _ndarray<float>* arr){
 extern "C" int _get_ndims_double_array(struct _ndarray<double>* arr){
     return arr->ndims;
 }
+
+extern "C" int* _get_dims_int_array(struct _ndarray<int>* arr){
+    return arr->dims;
+}
+
+extern "C" int* _get_dims_long_int_array(struct _ndarray<long int>* arr){
+    return arr->dims;
+}
+
+extern "C" int* _get_dims_float_array(struct _ndarray<float>* arr){
+    return arr->dims;
+}
+
+extern "C" int* _get_dims_double_array(struct _ndarray<double>* arr){
+    return arr->dims;
+}
