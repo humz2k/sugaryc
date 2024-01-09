@@ -8,8 +8,8 @@ import argparse
 
 def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, echo = False):
     ast = parse_file(inp, use_cpp=True,
-        cpp_path='cpp',
-        cpp_args=[r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"include")] + includes)
+        cpp_path='gcc-13',
+        cpp_args=['-E',r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"include")] + includes + ['-xc'])
     
     generator = c_generator.CGenerator()
 
