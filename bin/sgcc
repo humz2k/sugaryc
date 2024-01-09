@@ -16,7 +16,10 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
     out = generator.visit(ast)
 
     with open(os.path.join(os.path.dirname( __file__ ),"ops.hpp"),"r") as ops:
-        out = ops.read() + out
+        out = ops.read() + out + """\ntemplate<typename T>
+static inline const char* to_str(T in){
+    return __str__(in);
+}\n"""
 
     temp_file = outfile.split(".")[0] + "__sgc_tmp.cpp"
 

@@ -1,0 +1,54 @@
+#include <print.sgh>
+#include <stdlib.sgh>
+
+extern int sprintf(char *str, const char *format, ...);
+
+const char* __str__(const char* s){
+    return s;
+}
+
+const char* __str__(float f){
+    char* buffer = (char*)GC_malloc(sizeof(char) * 11);
+    sprintf(buffer, "%10.4g", f);
+    while (buffer[0] == ' '){
+        buffer = &buffer[1];
+    }
+    return buffer;
+}
+
+const char* __str__(double f){
+    char* buffer = (char*)GC_malloc(sizeof(char) * 11);
+    sprintf(buffer, "%10.4g", f);
+    while (buffer[0] == ' '){
+        buffer = &buffer[1];
+    }
+    return buffer;
+}
+
+const char* __str__(int a){
+    int sz = (a / 10) + 2;
+    char* buffer = (char*)GC_malloc(sizeof(char) * sz);
+    sprintf(buffer, "%d", a);
+    return buffer;
+}
+
+const char* __str__(long int a){
+    int sz = (a / 10) + 2;
+    char* buffer = (char*)GC_malloc(sizeof(char) * sz);
+    sprintf(buffer, "%ld", a);
+    return buffer;
+}
+
+const char* __str__(long long int a){
+    int sz = (a / 10) + 2;
+    char* buffer = (char*)GC_malloc(sizeof(char) * sz);
+    sprintf(buffer, "%lld", a);
+    return buffer;
+}
+
+const char* __str__(short a){
+    int sz = (a / 10) + 2;
+    char* buffer = (char*)GC_malloc(sizeof(char) * sz);
+    sprintf(buffer, "%d", a);
+    return buffer;
+}

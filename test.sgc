@@ -4,7 +4,7 @@
 #include <math.sgh>
 
 int main(){
-    float a = 5;
-    printf("%f\n",sin(a));
+    short a = 10;
+    println("Hello","World!",5.5,a);
     return 0;
 }

@@ -1,0 +1,17 @@
+#ifndef _PRINT_SGH_
+#define _PRINT_SGH_
+
+const char* __str__(const char* s);
+
+const char* __str__(float f);
+const char* __str__(double f);
+
+const char* __str__(short a);
+
+const char* __str__(int a);
+
+const char* __str__(long int a);
+
+const char* __str__(long long int a);
+
+#endif

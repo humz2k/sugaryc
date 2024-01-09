@@ -98,6 +98,28 @@ static inline T* __index__(T* t, int* idx, int nidx) {
 
 #define __index_wrapper__(var,...) (*__index__(var,(int[]){__VA_ARGS__},sizeof((int[]){__VA_ARGS__})/sizeof(int)))
 
+template <typename T>
+static inline const char* __str__(T a){
+    return "NULL";
+}
+
+template<typename T>
+static inline const char* to_str(T in);
+
+extern "C" int printf(const char* format, ... );
+
+static inline void print(){
+
+}
+
+template <typename T, typename... Args>
+static inline void print(T t, Args... args) {
+    printf("%s ",to_str(t));
+    print(args...);
+}
+
+#define println(...) print(__VA_ARGS__);printf("\n")
+
 /*template <typename T, typename... Args>
 static inline auto __index_wrapper__(T* t, Args... args) -> decltype(*__index__(t,args...)) {
     return *__index__(t,args...);
