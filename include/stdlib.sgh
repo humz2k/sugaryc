@@ -6,6 +6,11 @@ extern void* malloc(int);
 
 extern void free(void*);
 
+#define _COMBINE(a,b) a ## b
+#define _combine(a, b) _COMBINE(a, b)
+#define make(typ,...) _combine(make_,typ)(__VA_ARGS__)
+
+
 #include <print.sgh>
 
 #include <int_tuple.sgh>

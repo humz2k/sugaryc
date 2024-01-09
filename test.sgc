@@ -4,9 +4,6 @@
 #include <math.sgh>
 
 int main(){
-    auto a = make_int_array(2,5);
-    println(a.dims(),a.dims()[0],a.dims()[1]);
-    auto b = literal_int_tuple(1,2,3,4,5,6);
-    println(b,b.len());
+    array(int) a = make(array(int),10,10,10);
     return 0;
 }

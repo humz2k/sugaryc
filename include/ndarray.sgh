@@ -50,5 +50,8 @@ int_tuple dims(float_array arr);
 
 int_tuple dims(double_array arr);
 
+#define _COMBINE(a,b) a ## b
+#define _combine(a, b) _COMBINE(a, b)
+#define array(t) _combine(int,_array)
 
 #endif
