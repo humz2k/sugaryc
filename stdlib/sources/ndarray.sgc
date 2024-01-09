@@ -1,0 +1,25 @@
+#include <ndarray.sgh>
+
+extern int* _index_int_array(int_array arr, int* idxs, int nidx);
+
+extern long int* _index_long_int_array(long_int_array arr, int* idxs, int nidx);
+
+extern float* _index_float_array(float_array arr, int* idxs, int nidx);
+
+extern double* _index_double_array(double_array arr, int* idxs, int nidx);
+
+int* __index__(int_array arr, int* idxs, int nidx){
+    return _index_int_array(arr,idxs,nidx);
+}
+
+long int* __index__(long_int_array arr, int* idxs, int nidx){
+    return _index_long_int_array(arr,idxs,nidx);
+}
+
+float* __index__(float_array arr, int* idxs, int nidx){
+    return _index_float_array(arr,idxs,nidx);
+}
+
+double* __index__(double_array arr, int* idxs, int nidx){
+    return _index_double_array(arr,idxs,nidx);
+}
