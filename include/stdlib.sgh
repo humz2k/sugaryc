@@ -10,6 +10,7 @@ extern void free(void*);
 #define _combine(a, b) _COMBINE(a, b)
 #define make(typ,...) _combine(make_,typ)(__VA_ARGS__)
 
+#define NULL ((void*)0)
 
 #include <print.sgh>
 

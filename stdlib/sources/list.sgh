@@ -1,0 +1,106 @@
+#include <assert.sgh>
+#include <stdlib.sgh>
+
+#ifndef list_t
+#define list_t int
+#endif
+
+#define _COMBINE(a,b) a ## b
+#define _combine(a, b) _COMBINE(a, b)
+
+#define list_struct _combine(list_t,_list_struct)
+#define alloc_list_struct _combine(alloc_,_combine(list_t,_list_struct))
+#define list_block _combine(list_t,_list_block)
+#define alloc_list_block _combine(alloc_,_combine(list_t,_list_block))
+#define index_list_block _combine(index_,_combine(list_t,_list_block))
+#define list_section _combine(list_t,_list_section)
+#define alloc_list_section _combine(alloc_,_combine(list_t,_list_section))
+#define index_list_section _combine(index_,_combine(list_t,_list_section))
+#define LIST _combine(list_t,_list)
+#define make_list _combine(make_,LIST)
+
+#define LIST_BLOCK_SIZE 20
+#define N_LIST_DIRECT 10
+
+struct list_block{
+    int used;
+    list_t block[LIST_BLOCK_SIZE];
+};
+
+static inline struct list_block* alloc_list_block(void){
+    struct list_block* out = (struct list_block*)GC_malloc(sizeof(struct list_block));
+    out->used = 0;
+    return out;
+}
+
+struct list_section{
+    int length;
+    struct list_block* direct_blocks[N_LIST_DIRECT];
+    struct list_section* next; 
+};
+
+static inline struct list_section* alloc_list_section(void){
+    struct list_section* out = (struct list_section*)GC_malloc(sizeof(struct list_section));
+    out->length = 0;
+    out->next = NULL;
+    for (int i = 0; i < N_LIST_DIRECT; i++){
+        out->direct_blocks[i] = NULL;
+    }
+    return out;
+}
+
+struct list_struct{
+    struct list_section section;
+    int length;
+};
+
+typedef struct list_struct* LIST;
+
+LIST make_list(void){
+    LIST out = (LIST)GC_malloc(sizeof(struct list_section));
+    out->section.length = 0;
+    out->section.next = NULL;
+    for (int i = 0; i < N_LIST_DIRECT; i++){
+        out->section.direct_blocks[i] = NULL;
+    }
+    out->length = 0;
+    return out;
+}
+
+static inline list_t* index_list_block(struct list_block* block, int idx){
+    assert(block != NULL);
+    assert(idx <= block->used);
+    return &block->block[idx];
+}
+
+static inline list_t* index_list_section(struct list_section* section, int idx){
+    assert(section != NULL);
+    assert(idx >= 0);
+    assert(section->length >= 0);
+
+    if (idx < section->length){
+        int block_number = idx / LIST_BLOCK_SIZE;
+        assert(block_number < N_LIST_DIRECT);
+        return index_list_block(section->direct_blocks[block_number],idx % LIST_BLOCK_SIZE);
+    }
+
+    assert(section->length == N_LIST_DIRECT * LIST_BLOCK_SIZE);
+    return index_list_section(section->next,idx - N_LIST_DIRECT * LIST_BLOCK_SIZE);
+}
+
+list_t* __index__(LIST lst, int* idxs, int nidx){
+    assert(nidx == 1);
+    return index_list_section(&lst->section,idxs[0]);
+}
+
+
+#undef list_struct
+#undef alloc_list_struct
+#undef list_block
+#undef alloc_list_block
+#undef index_list_block
+#undef list_section
+#undef alloc_list_section
+#undef index_list_section
+#undef LIST
+#undef make_list

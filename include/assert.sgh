@@ -1,0 +1,1 @@
+#define assert(cond) if (!(cond)){printf("%s: FAILED\n",#cond); exit(1);}
