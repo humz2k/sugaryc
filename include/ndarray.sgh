@@ -1,3 +1,6 @@
+#ifndef _NDARRAY_SGH_
+#define _NDARRAY_SGH_
+
 struct _int_array;
 struct _long_int_array;
 struct _float_array;
@@ -28,3 +31,5 @@ long int* __index__(long_int_array arr, int* idxs, int nidx);
 float* __index__(float_array arr, int* idxs, int nidx);
 
 double* __index__(double_array arr, int* idxs, int nidx);
+
+#endif

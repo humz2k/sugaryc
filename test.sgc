@@ -1,13 +1,10 @@
 #include <stdlib.sgh>
 #include <string.sgh>
 #include <ndarray.sgh>
+#include <math.sgh>
 
 int main(){
-    int_array arr = make_int_array(10,10);
-    arr[0,0] = 3;
-    printf("%d\n",arr[0,0]);
-    arr[0,0]++;
-    arr[1,0] = 5 + arr[0,0];
-    printf("%d\n",arr[1,0]);
+    float a = 5;
+    printf("%f\n",sin(a));
     return 0;
 }

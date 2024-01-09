@@ -1,3 +1,6 @@
+#ifndef _STRING_SGH_
+#define _STRING_SGH_
+
 typedef const char* string;
 
 string __add__(string left, string right);
@@ -5,3 +8,5 @@ string __add__(string left, string right);
 string __mul__(string left, int right);
 
 string __mul__(int left, string right);
+
+#endif

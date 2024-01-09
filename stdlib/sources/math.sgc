@@ -1,0 +1,81 @@
+#include <math.sgh>
+
+float sin(float x) {
+    return sinf(x);
+}
+
+float cos(float x) {
+    return cosf(x);
+}
+
+float tan(float x) {
+    return tanf(x);
+}
+
+float asin(float x) {
+    return asinf(x);
+}
+
+float acos(float x) {
+    return acosf(x);
+}
+
+float atan(float x) {
+    return atanf(x);
+}
+
+float atan2(float y, float x) {
+    return atan2f(y, x);
+}
+
+float sinh(float x) {
+    return sinhf(x);
+}
+
+float cosh(float x) {
+    return coshf(x);
+}
+
+float tanh(float x) {
+    return tanhf(x);
+}
+
+float exp(float x) {
+    return expf(x);
+}
+
+float log(float x) {
+    return logf(x);
+}
+
+float log10(float x) {
+    return log10f(x);
+}
+
+float pow(float x, float y) {
+    return powf(x, y);
+}
+
+float sqrt(float x) {
+    return sqrtf(x);
+}
+
+float cbrt(float x) {
+    return cbrtf(x);
+}
+
+float ceil(float x) {
+    return ceilf(x);
+}
+
+float floor(float x) {
+    return floorf(x);
+}
+
+float fmod(float x, float y) {
+    return fmodf(x, y);
+}
+
+float fabs(float x) {
+    return fabsf(x);
+}
