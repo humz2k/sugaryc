@@ -1,0 +1,51 @@
+#ifndef _LISTS_SGH_
+#define _LISTS_SGH_
+
+#define _COMBINE(a,b) a ## b
+#define _combine(a, b) _COMBINE(a, b)
+
+
+struct void_list_struct;
+typedef struct void_list_struct* void_list;
+
+void_list make_void_list(void);
+
+void** __index__(void_list lst, int* idxs, int nidxs);
+
+int append(void_list lst, void* item);
+
+void* pop(void_list lst);
+void* pop(void_list lst, int idx);
+int insert(void_list lst, int idx, void* item);
+int len(void_list lst);
+
+
+#define inst_list(t,name) struct _combine(name,_struct){\
+                            void_list raw_list;\
+                        }\
+                        typedef struct _combine(name,_struct)* name;\
+                        static inline name _combine(make_,name)(void){\
+                            name out = (name)GC_malloc(sizeof(struct _combine(name,_struct)));\
+                            out->raw_list = make_void_list();\
+                            return out;\
+                        }\
+                        static inline t* __index__(name my_list,int* idxs, int nidxs){\
+                            return (t*)__index__(my_list->raw_list,idxs,nidxs);\
+                        }\
+                        static inline int append(name my_list, t item){\
+                            return append(my_list->raw_list,(void*)item);\
+                        }\
+                        static inline t pop(name my_list){\
+                            return (t)pop(my_list->raw_list);\
+                        }\
+                        static inline t pop(name my_list, int idx){\
+                            return (t)pop(my_list->raw_list,idx);\
+                        }\
+                        static inline int insert(name my_list, int idx, t item){\
+                            return insert(my_list->raw_list,idx,(void*)item);\
+                        }\
+                        static inline int len(name my_list){\
+                            return len(my_list->raw_list);\
+                        }
+
+#endif

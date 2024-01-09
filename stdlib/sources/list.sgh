@@ -8,99 +8,114 @@
 #define _COMBINE(a,b) a ## b
 #define _combine(a, b) _COMBINE(a, b)
 
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
 #define list_struct _combine(list_t,_list_struct)
-#define alloc_list_struct _combine(alloc_,_combine(list_t,_list_struct))
 #define list_block _combine(list_t,_list_block)
 #define alloc_list_block _combine(alloc_,_combine(list_t,_list_block))
 #define index_list_block _combine(index_,_combine(list_t,_list_block))
-#define list_section _combine(list_t,_list_section)
-#define alloc_list_section _combine(alloc_,_combine(list_t,_list_section))
-#define index_list_section _combine(index_,_combine(list_t,_list_section))
 #define LIST _combine(list_t,_list)
 #define make_list _combine(make_,LIST)
 
 #define LIST_BLOCK_SIZE 20
-#define N_LIST_DIRECT 10
 
 struct list_block{
-    int used;
-    list_t block[LIST_BLOCK_SIZE];
+    list_t item;
+    struct list_block* next;
 };
 
-static inline struct list_block* alloc_list_block(void){
+struct list_block* alloc_list_block(void){
     struct list_block* out = (struct list_block*)GC_malloc(sizeof(struct list_block));
-    out->used = 0;
-    return out;
-}
-
-struct list_section{
-    int length;
-    struct list_block* direct_blocks[N_LIST_DIRECT];
-    struct list_section* next; 
-};
-
-static inline struct list_section* alloc_list_section(void){
-    struct list_section* out = (struct list_section*)GC_malloc(sizeof(struct list_section));
-    out->length = 0;
     out->next = NULL;
-    for (int i = 0; i < N_LIST_DIRECT; i++){
-        out->direct_blocks[i] = NULL;
-    }
     return out;
 }
 
 struct list_struct{
-    struct list_section section;
     int length;
+    struct list_block* first;
 };
 
 typedef struct list_struct* LIST;
 
 LIST make_list(void){
-    LIST out = (LIST)GC_malloc(sizeof(struct list_section));
-    out->section.length = 0;
-    out->section.next = NULL;
-    for (int i = 0; i < N_LIST_DIRECT; i++){
-        out->section.direct_blocks[i] = NULL;
-    }
+    LIST out = (LIST)GC_malloc(sizeof(struct list_struct));
     out->length = 0;
+    out->first = NULL;
     return out;
 }
 
-static inline list_t* index_list_block(struct list_block* block, int idx){
-    assert(block != NULL);
-    assert(idx <= block->used);
-    return &block->block[idx];
-}
-
-static inline list_t* index_list_section(struct list_section* section, int idx){
-    assert(section != NULL);
-    assert(idx >= 0);
-    assert(section->length >= 0);
-
-    if (idx < section->length){
-        int block_number = idx / LIST_BLOCK_SIZE;
-        assert(block_number < N_LIST_DIRECT);
-        return index_list_block(section->direct_blocks[block_number],idx % LIST_BLOCK_SIZE);
+static inline struct list_block* index_list_block(struct list_block* block, int idx){
+    struct list_block* cur = block;
+    if (cur == NULL){
+        print("%s bounds error: %d out of bounds\n",TOSTRING(lst),idx);
+        exit(1);
     }
 
-    assert(section->length == N_LIST_DIRECT * LIST_BLOCK_SIZE);
-    return index_list_section(section->next,idx - N_LIST_DIRECT * LIST_BLOCK_SIZE);
+    for (int i = 0; i < idx; i++){
+        cur = cur->next;
+        if (cur == NULL){
+            print("%s bounds error: %d out of bounds\n",TOSTRING(lst),idx);
+            exit(1);
+        }
+    }
+
+    return cur;
 }
 
-list_t* __index__(LIST lst, int* idxs, int nidx){
+list_t* __index__(LIST lst, int* idx, int nidx){
     assert(nidx == 1);
-    return index_list_section(&lst->section,idxs[0]);
+    assert(lst != NULL);
+    struct list_block* block = index_list_block(lst->first,*idx);
+    return &block->item;
 }
 
+int append(LIST lst, list_t val){
+    assert(lst != NULL);
+    if (lst->length == 0){
+        assert(lst->first == NULL);
+        lst->first = alloc_list_block();
+        lst->first->item = val;
+        lst->length = 1;
+        return lst->length;
+    }
+    assert(lst->length > 0);
+    struct list_block* block = index_list_block(lst->first,lst->length - 1);
+    assert(block != NULL);
+    assert(block->next == NULL);
+    block->next = alloc_list_block();
+    block->next->item = val;
+    lst->length++;
+    return lst->length;
+    
+}
+
+list_t pop(LIST lst, int idx){
+    assert(lst != NULL);
+    if (lst->length == 0){
+        assert(lst->first == NULL);
+        print("%s bounds error: trying to pop from empty list\n",TOSTRING(list));
+        exit(1);
+    }
+    
+    if (idx == 0){
+        struct list_block* block = lst->first;
+        lst->first = lst->first->next;
+        lst->length--;
+        return block->item;
+    }
+    
+    assert(idx > 0);
+
+    struct list_block* block = index_list_block(lst->first,idx-1);
+
+    //FINISH ME
+
+}
 
 #undef list_struct
-#undef alloc_list_struct
 #undef list_block
 #undef alloc_list_block
 #undef index_list_block
-#undef list_section
-#undef alloc_list_section
-#undef index_list_section
 #undef LIST
 #undef make_list

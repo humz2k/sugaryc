@@ -4,6 +4,8 @@
 #include <math.sgh>
 
 int main(){
-    array(int) a = make(array(int),10,10,10);
+    
+    auto a = make_long4(1,2,3,4);
+    println(a);
     return 0;
 }

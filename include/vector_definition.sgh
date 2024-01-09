@@ -1,0 +1,82 @@
+#ifndef vector_t
+#define vector_t float
+#endif
+
+#include <string.sgh>
+
+#define _COMBINE(a,b) a ## b
+#define _combine(a, b) _COMBINE(a, b)
+
+#define vector2 _combine(vector_t,2)
+#define make_vector2 _combine(make_,vector2)
+#define vector3 _combine(vector_t,3)
+#define make_vector3 _combine(make_,vector3)
+#define vector4 _combine(vector_t,4)
+#define make_vector4 _combine(make_,vector4)
+
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
+typedef struct {
+    vector_t x;
+    vector_t y;
+} vector2;
+
+static inline vector2 make_vector2(vector_t x, vector_t y){
+    vector2 out;
+    out.x = x;
+    out.y = y;
+    return out;
+}
+
+static inline string __str__(vector2 vec){
+    string out = TOSTRING(vector2) + "{" + to_str(vec.x) + ", " + to_str(vec.y) + "}";
+    return out;
+}
+
+typedef struct {
+    vector_t x;
+    vector_t y;
+    vector_t z;
+} vector3;
+
+static inline vector3 make_vector3(vector_t x, vector_t y, vector_t z){
+    vector3 out;
+    out.x = x;
+    out.y = y;
+    out.z = z;
+    return out;
+}
+
+static inline string __str__(vector3 vec){
+    string out = TOSTRING(vector3) + "{" + to_str(vec.x) + ", " + to_str(vec.y) + ", " + to_str(vec.z) + "}";
+    return out;
+}
+
+typedef struct {
+    vector_t x;
+    vector_t y;
+    vector_t z;
+    vector_t w;
+} vector4;
+
+static inline vector4 make_vector4(vector_t x, vector_t y, vector_t z, vector_t w){
+    vector4 out;
+    out.x = x;
+    out.y = y;
+    out.z = z;
+    out.w = w;
+    return out;
+}
+
+static inline string __str__(vector4 vec){
+    string out = TOSTRING(vector4) + "{" + to_str(vec.x) + ", " + to_str(vec.y) + ", " + to_str(vec.z) + ", " + to_str(vec.w) + "}";
+    return out;
+}
+
+#undef vector2
+#undef vector3
+#undef vector4
+#undef make_vector2
+#undef make_vector3
+#undef make_vector4

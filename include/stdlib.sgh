@@ -16,4 +16,6 @@ extern void free(void*);
 
 #include <int_tuple.sgh>
 
+#include <vector_types.sgh>
+
 #endif
