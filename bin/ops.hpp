@@ -6,6 +6,16 @@ static inline typename std::common_type<T, T2>::type __add__(T t, T2 t2) {
     return t + t2;
 }
 
+template <typename T>
+static inline T* __add__(T* t, int t2) {
+    return t + t2;
+}
+
+template <typename T>
+static inline T* __add__(int t, T* t2) {
+    return t + t2;
+}
+
 template <typename T, typename T2>
 static inline typename std::common_type<T, T2>::type __sub__(T t, T2 t2) {
     return t - t2;
@@ -96,7 +106,7 @@ static inline T* __index__(T* t, int* idx, int nidx) {
     return &t[idx[0]];
 }
 
-//Yes, this is gross and bad but I like syntax sugar
+//Yes, this is gross and bad but I like syntax sugar. If you want performance, just do *(ptr + idx).
 
 static inline int _n_var_args(){
     return 0;
