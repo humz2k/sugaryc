@@ -96,7 +96,40 @@ static inline T* __index__(T* t, int* idx, int nidx) {
     return &t[idx[0]];
 }
 
-#define __index_wrapper__(var,...) (*__index__(var,(int[]){__VA_ARGS__},sizeof((int[]){__VA_ARGS__})/sizeof(int)))
+//Yes, this is gross and bad but I like syntax sugar
+
+static inline int _n_var_args(){
+    return 0;
+}
+
+template <typename T, typename... Args>
+static inline int _n_var_args(T i, Args... args){
+    return 1 + _n_var_args(args...);
+}
+
+extern "C" void* GC_malloc(int);
+
+template <typename T>
+static inline void _vaptr_helper(T* out, int n){
+
+}
+
+template <typename T, typename... Args>
+static inline void _vaptr_helper(T* out, int n, T i, Args... args){
+    out[n] = i;
+    _vaptr_helper(out,n+1,args...);
+}
+
+template <typename T, typename... Args>
+static inline T* _var_args_to_ptr(T i, Args... args){
+    int n = _n_var_args(i,args...);
+    T* out = (T*)GC_malloc(sizeof(T) * n);
+    _vaptr_helper(out,0,i,args...);
+    return out;
+}
+
+//#define __index_wrapper__(var,...) (*__index__(var,(int[]){__VA_ARGS__},_n_var_args(__VA_ARGS__)))
+#define __index_wrapper__(var,...) (*__index__(var,_var_args_to_ptr(__VA_ARGS__),_n_var_args(__VA_ARGS__)))
 
 template <typename T>
 static inline const char* __str__(T a){

@@ -6,8 +6,6 @@ extern void* malloc(int);
 
 extern void free(void*);
 
-extern void* GC_malloc(int);
-
 #include <print.sgh>
 
 #include <int_tuple.sgh>
