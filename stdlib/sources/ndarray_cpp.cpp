@@ -80,3 +80,19 @@ extern "C" float* _index_float_array(struct _ndarray<float>* arr, int* idxs, int
 extern "C" double* _index_double_array(struct _ndarray<double>* arr, int* idxs, int nidx){
     return _index_ndarray(arr,idxs,nidx);
 }
+
+extern "C" int _get_ndims_int_array(struct _ndarray<int>* arr){
+    return arr->ndims;
+}
+
+extern "C" int _get_ndims_long_int_array(struct _ndarray<long int>* arr){
+    return arr->ndims;
+}
+
+extern "C" int _get_ndims_float_array(struct _ndarray<float>* arr){
+    return arr->ndims;
+}
+
+extern "C" int _get_ndims_double_array(struct _ndarray<double>* arr){
+    return arr->ndims;
+}

@@ -7,7 +7,7 @@ struct _float_array;
 struct _double_array;
 
 typedef struct _int_array* int_array;
-typedef struct _long_int_array* long_int_array;
+typedef struct _long_int_array* long_array;
 typedef struct _float_array* float_array;
 typedef struct _double_array* double_array;
 
@@ -17,19 +17,27 @@ float_array _make_float_array(int* dims, int ndims);
 
 int_array _make_int_array(int* dims, int ndims);
 
-long_int_array _make_long_int_array(int* dims, int ndims);
+long_array _make_long_int_array(int* dims, int ndims);
 
 #define make_int_array(...) (_make_int_array((int[]){__VA_ARGS__},sizeof((int[]){__VA_ARGS__})/sizeof(int)))
 #define make_float_array(...) (_make_float_array((int[]){__VA_ARGS__},sizeof((int[]){__VA_ARGS__})/sizeof(int)))
 #define make_double_array(...) (_make_double_array((int[]){__VA_ARGS__},sizeof((int[]){__VA_ARGS__})/sizeof(int)))
-#define make_long_int_array(...) (_make_long_int_array((int[]){__VA_ARGS__},sizeof((int[]){__VA_ARGS__})/sizeof(int)))
+#define make_long_array(...) (_make_long_int_array((int[]){__VA_ARGS__},sizeof((int[]){__VA_ARGS__})/sizeof(int)))
 
 int* __index__(int_array arr, int* idxs, int nidx);
 
-long int* __index__(long_int_array arr, int* idxs, int nidx);
+long int* __index__(long_array arr, int* idxs, int nidx);
 
 float* __index__(float_array arr, int* idxs, int nidx);
 
 double* __index__(double_array arr, int* idxs, int nidx);
+
+int ndims(int_array arr);
+
+int ndims(long_array arr);
+
+int ndims(float_array arr);
+
+int ndims(double_array arr);
 
 #endif
