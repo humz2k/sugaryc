@@ -4,6 +4,7 @@
 #define _COMBINE(a,b) a ## b
 #define _combine(a, b) _COMBINE(a, b)
 
+#include <string.sgh>
 
 struct void_list_struct;
 typedef struct void_list_struct* void_list;
@@ -19,10 +20,11 @@ void* pop(void_list lst, int idx);
 int insert(void_list lst, int idx, void* item);
 int len(void_list lst);
 
+#define list(t) _combine(t,_list)
 
 #define inst_list(t,name) struct _combine(name,_struct){\
                             void_list raw_list;\
-                        }\
+                        };\
                         typedef struct _combine(name,_struct)* name;\
                         static inline name _combine(make_,name)(void){\
                             name out = (name)GC_malloc(sizeof(struct _combine(name,_struct)));\
@@ -46,6 +48,21 @@ int len(void_list lst);
                         }\
                         static inline int len(name my_list){\
                             return len(my_list->raw_list);\
+                        }\
+                        static inline string __str__(name my_list){\
+                            string out = "[";\
+                            int length = len(my_list);\
+                            for (int i = 0; i < length - 1; i++){\
+                                out += to_str(my_list[i]) + ", ";\
+                            }\
+                            if (length > 0){\
+                                out += to_str(my_list[length - 1]);\
+                            }\
+                            out += "]";\
+                            return out;\
                         }
+
+
+inst_list(string,string_list);
 
 #endif

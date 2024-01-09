@@ -101,6 +101,16 @@ static inline typename std::common_type<T, T2>::type __neq__(T t, T2 t2) {
     return t != t2;
 }
 
+template <typename T, typename T2>
+static inline int __eq__(T* t, T2 t2) {
+    return t == t2;
+}
+
+template <typename T, typename T2>
+static inline int __neq__(T* t, T2 t2) {
+    return t != t2;
+}
+
 template <typename T>
 static inline T* __index__(T* t, int* idx, int nidx) {
     return &t[idx[0]];
@@ -162,3 +172,9 @@ static inline void print(T t, Args... args) {
 }
 
 #define println(...) print(__VA_ARGS__);printf("\n")
+
+extern "C" void exit(int);
+
+//#ifndef NULL
+
+//#endif

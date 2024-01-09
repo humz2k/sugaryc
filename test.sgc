@@ -2,10 +2,9 @@
 #include <string.sgh>
 #include <ndarray.sgh>
 #include <math.sgh>
+#include <lists.sgh>
 
 int main(){
     
-    auto a = make_long4(1,2,3,4);
-    println(a);
     return 0;
 }

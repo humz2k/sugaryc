@@ -21,11 +21,11 @@
 #define LIST_BLOCK_SIZE 20
 
 struct list_block{
-    list_t item;
+    list_t* item;
     struct list_block* next;
 };
 
-struct list_block* alloc_list_block(void){
+static inline struct list_block* alloc_list_block(void){
     struct list_block* out = (struct list_block*)GC_malloc(sizeof(struct list_block));
     out->next = NULL;
     return out;
@@ -63,14 +63,14 @@ static inline struct list_block* index_list_block(struct list_block* block, int 
     return cur;
 }
 
-list_t* __index__(LIST lst, int* idx, int nidx){
+list_t** __index__(LIST lst, int* idx, int nidx){
     assert(nidx == 1);
     assert(lst != NULL);
     struct list_block* block = index_list_block(lst->first,*idx);
     return &block->item;
 }
 
-int append(LIST lst, list_t val){
+int append(LIST lst, list_t* val){
     assert(lst != NULL);
     if (lst->length == 0){
         assert(lst->first == NULL);
@@ -90,7 +90,7 @@ int append(LIST lst, list_t val){
     
 }
 
-list_t pop(LIST lst, int idx){
+list_t* pop(LIST lst, int idx){
     assert(lst != NULL);
     if (lst->length == 0){
         assert(lst->first == NULL);
@@ -109,8 +109,42 @@ list_t pop(LIST lst, int idx){
 
     struct list_block* block = index_list_block(lst->first,idx-1);
 
-    //FINISH ME
+    struct list_block* to_remove = block->next;
+    assert(to_remove != NULL);
+    block->next = to_remove->next;
+    lst->length--;
+    return to_remove->item;
 
+}
+
+list_t* pop(LIST lst){
+    assert(lst != NULL);
+    return pop(lst,lst->length - 1);
+}
+
+int insert(LIST lst, int idx, list_t* val){
+    assert(lst != NULL);
+    if (idx == 0){
+        struct list_block* block = alloc_list_block();
+        block->next = lst->first;
+        block->item = val;
+        lst->first = block;
+        lst->length++;
+        return lst->length;
+    }
+    assert(idx > 0);
+    struct list_block* block = index_list_block(lst->first,idx - 1);
+    struct list_block* new_block = alloc_list_block();
+    new_block->item = val;
+    new_block->next = block->next;
+    block->next = new_block;
+    lst->length++;
+    return lst->length;
+}
+
+int len(LIST lst){
+    assert(lst != NULL);
+    return lst->length;
 }
 
 #undef list_struct
