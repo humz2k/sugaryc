@@ -1,0 +1,9 @@
+#include <stdlib.sgh>
+#include <string.sgh>
+
+int main(){
+    string a = "This is a string";
+    auto b = "this is another string!";
+    println(a + ", and " + b);
+    return 0;
+}

@@ -1,0 +1,35 @@
+#include <stdlib.sgh>
+#include <string.sgh>
+
+struct my_struct{
+    int a;
+};
+
+typedef struct my_struct* my_object;
+
+my_object make_my_object(void){
+    my_object out = (my_object)GC_malloc(sizeof(struct my_struct));
+    out->a = 0;
+    return out;
+}
+
+int get_a(my_object obj){
+    return obj->a;
+}
+
+void set_a(my_object obj, int a){
+    obj->a = a;
+}
+
+string __str__(my_object obj){
+    string out = "my_struct{" + to_str(obj->a) + "}";
+    return out;
+}
+
+int main(){
+    auto obj = make(my_object);
+    obj.set_a(10);
+    println("a =",obj.get_a());
+    println(obj);
+    return 0;
+}
