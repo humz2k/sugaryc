@@ -4,7 +4,16 @@
 #include <math.sgh>
 #include <lists.sgh>
 
+__global__ void my_kernel(int s){
+    int i = threadIdx.x+blockDim.x*blockIdx.x;
+    printf("Hello from thread %d\n",i);
+    //println(i);
+}
+
+
 int main(){
-    
+
+    LAUNCH_KERNEL(my_kernel,1,32,10);
+
     return 0;
 }

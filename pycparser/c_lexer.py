@@ -105,7 +105,7 @@ class CLexer(object):
         'REGISTER', 'OFFSETOF',
         'RESTRICT', 'RETURN', 'SHORT', 'SIGNED', 'SIZEOF', 'STATIC', 'STRUCT',
         'SWITCH', 'TYPEDEF', 'UNION', 'UNSIGNED', 'VOID',
-        'VOLATILE', 'WHILE', '__INT128',
+        'VOLATILE', 'WHILE', '__INT128', '__GLOBAL__'
     )
 
     keywords_new = (

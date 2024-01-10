@@ -926,6 +926,7 @@ class CParser(PLYParser):
                             | RESTRICT
                             | VOLATILE
                             | _ATOMIC
+                            | __GLOBAL__
         """
         p[0] = p[1]
 

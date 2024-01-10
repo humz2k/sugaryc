@@ -175,6 +175,16 @@ static inline void print(T t, Args... args) {
 
 extern "C" void exit(int);
 
+#define __global__ 
+
+#define LAUNCH_KERNEL(func,numBlocks,blockSize,...) \
+{\
+    _Pragma("omp parallel for")\
+    for (int _i = 0; _i < numBlocks * blockSize; _i++){\
+        func(make_int3(_i/blockSize,0,0),make_int3(blockSize,1,1),make_int3(_i%blockSize,0,0), __VA_ARGS__);\
+    }\
+}
+
 //#ifndef NULL
 
 //#endif
