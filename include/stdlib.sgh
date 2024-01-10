@@ -2,7 +2,7 @@
 #ifndef _STDLIB_SGH_
 #define _STDLIB_SGH_
 
-extern void* malloc(int);
+extern void* malloc(long unsigned int);
 
 extern void free(void*);
 
@@ -18,5 +18,7 @@ extern void free(void*);
 #include <int_tuple.sgh>
 
 #include <vector_types.sgh>
+
+#define __device__
 
 #endif

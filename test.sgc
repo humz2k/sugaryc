@@ -13,7 +13,7 @@ __global__ void my_kernel(int s){
 
 int main(){
 
-    LAUNCH_KERNEL(my_kernel,1,32,10);
+    LAUNCH_KERNEL(my_kernel,1,64,10);
 
     return 0;
 }

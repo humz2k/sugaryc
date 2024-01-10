@@ -177,11 +177,17 @@ extern "C" void exit(int);
 
 #define __global__ 
 
+#define warpsize 32
+
 #define LAUNCH_KERNEL(func,numBlocks,blockSize,...) \
 {\
-    _Pragma("omp parallel for")\
-    for (int _i = 0; _i < numBlocks * blockSize; _i++){\
-        func(make_int3(_i/blockSize,0,0),make_int3(blockSize,1,1),make_int3(_i%blockSize,0,0), __VA_ARGS__);\
+    for (int _bidx = 0; _bidx < numBlocks; _bidx++){\
+        _Pragma("omp parallel for")\
+        for (int _warpidx = 0; _warpidx < blockSize/(warpsize/2); _warpidx++){\
+            for (int _modid = 0; _modid < (warpsize/2); _modid++){\
+                func(make_int3(_bidx,0,0),make_int3(blockSize,1,1),make_int3(_warpidx * (warpsize/2) + _modid,0,0), __VA_ARGS__);\
+            }\
+        }\
     }\
 }
 

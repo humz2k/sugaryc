@@ -177,18 +177,24 @@ extern "C" void exit(int);
 
 #define __global__ 
 
+#define warpsize 32
+
 #define LAUNCH_KERNEL(func,numBlocks,blockSize,...) \
 {\
-    _Pragma("omp parallel for")\
-    for (int _i = 0; _i < numBlocks * blockSize; _i++){\
-        func(make_int3(_i/blockSize,0,0),make_int3(blockSize,1,1),make_int3(_i%blockSize,0,0), __VA_ARGS__);\
+    for (int _bidx = 0; _bidx < numBlocks; _bidx++){\
+        _Pragma("omp parallel for")\
+        for (int _warpidx = 0; _warpidx < blockSize/(warpsize/2); _warpidx++){\
+            for (int _modid = 0; _modid < (warpsize/2); _modid++){\
+                func(make_int3(_bidx,0,0),make_int3(blockSize,1,1),make_int3(_warpidx * (warpsize/2) + _modid,0,0), __VA_ARGS__);\
+            }\
+        }\
     }\
 }
 
 //#ifndef NULL
 
 //#endif
-extern "C" void *malloc(int);
+extern "C" void *malloc(long unsigned int);
 extern "C" void free(void *);
 const char *__str__(const char *s);
 const char *__str__(float f);
@@ -602,7 +608,6 @@ extern "C" double fdim(double x, double y);
 extern "C" double fmax(double x, double y);
 extern "C" double fmin(double x, double y);
 extern "C" double fabs(double x);
-extern "C" double abs(double x);
 extern "C" double fma(double x, double y, double z);
 extern "C" const double M_PI;
 extern "C" const double M_E;
@@ -760,7 +765,7 @@ __global__ void my_kernel(int3 blockIdx, int3 blockDim, int3 threadIdx, int s)
 
 int main()
 {
-  LAUNCH_KERNEL(my_kernel, 1, 32, 10);
+  LAUNCH_KERNEL(my_kernel, 1, 64, 10);
   return 0;
 }
 

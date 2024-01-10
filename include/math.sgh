@@ -65,7 +65,6 @@ extern double fmax(double x, double y);
 extern double fmin(double x, double y);
 
 extern double fabs(double x);
-extern double abs(double x);
 extern double fma(double x, double y, double z);
 
 extern const double M_PI;
