@@ -3,7 +3,8 @@
 
 extern char *strcat(char *destination, const char *source);
 extern char *strcpy(char *dest, const char *src);
-extern int strlen(const char *str);
+extern long unsigned int strlen(const char *str);
+extern int strcmp (const char* str1, const char* str2);
 
 string __add__(string left, string right){
     int sz = strlen(left) + strlen(right) + 1;
@@ -23,4 +24,16 @@ string __mul__(string left, int right){
 
 string __mul__(int left, string right){
     return right * left;
+}
+
+int __eq__(string left, string right){
+    return strcmp(left,right) == 0;
+}
+
+int __neq__(string left, string right){
+    return strcmp(left,right) != 0;
+}
+
+int len(string str){
+    return strlen(str);
 }

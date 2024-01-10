@@ -9,4 +9,10 @@ string __mul__(string left, int right);
 
 string __mul__(int left, string right);
 
+int __eq__(string left, string right);
+
+int __neq__(string left, string right);
+
+int len(string str);
+
 #endif

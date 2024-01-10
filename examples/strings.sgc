@@ -5,5 +5,7 @@ int main(){
     string a = "This is a string";
     auto b = "this is another string!";
     println(a + ", and " + b);
+    println("The length of b is",len(b));
+    println("The length of a is",a.len());
     return 0;
 }
