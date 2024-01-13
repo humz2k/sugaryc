@@ -1,6 +1,6 @@
 # sugaryc
  
-C, but with function overloading, operator overloading, and uniform function call syntax.
+C, but with function overloading, operator overloading, and uniform function call syntax (and a garbage collector).
 
 ```
 struct my_struct{
@@ -21,5 +21,6 @@ int main(){
  my_object obj = (my_object)malloc(sizeof(struct my_struct));
  obj.set_a(10);
  int a = obj.get_a();
+ free(obj);
  return 0;
 }
