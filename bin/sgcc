@@ -52,9 +52,9 @@ class GeneratedTemplate:
         return "__generate(" + "_".join(self.gen_strs) + "__" + "_".join(self.Ts) + ")\n"
 
     def generate(self,code,reTs):
-        if (tuple(reTs) in self.generated):
+        if (tuple([i.strip().replace(" ","") for i in reTs]) in self.generated):
             return code
-        self.generated.append(tuple(reTs))
+        self.generated.append(tuple([i.strip().replace(" ","") for i in reTs]))
         assert(len(reTs) == len(self.Ts))
         out_str = self.code
         for t,T in zip(reTs,self.Ts):
@@ -106,13 +106,12 @@ def handle_generated(raw):
     out_func = capture_template(func)
     template_str = out.string[out.span()[0]:out.span()[1]]
     to_replace = template_str + out_func + "}"
-    replace_with = ""
     temp = GeneratedTemplate(gen_strs,out_func,Ts)
     for gen_str in gen_strs:
         generateds[gen_str] = temp
     raw = raw.replace(to_replace,temp.get_replacer())
     
-    return raw
+    return handle_generated(raw)
 
 def replace_innermost_brackets(code):
     # Pattern to match the innermost angle brackets
@@ -130,8 +129,31 @@ def replace_innermost_brackets(code):
         if (gen_str in generateds):
             Ts = [i.strip() for i in match.group(2).split(",")]
             to_gen.append((generateds[gen_str],Ts))
+        replaces = {
+            "*": "ptr",
+            "%": "mod",
+            "=": "eq",
+            "+": "add",
+            "-": "sub",
+            "/": "div",
+            "<": "lt",
+            ">": "gt",
+            "(": "lpar",
+            ")": "rpar",
+            "!": "not",
+            "~": "neg"
+        }
+
+        tmp = [i.strip().replace(" ","") for i in match.group(2).split(",")]
+        out = []
+        for i in tmp:
+            t = i
+            for j in replaces:
+                t = t.replace(j,replaces[j])
+            out.append(t)
+        tmp = out
         # Replace angle brackets with parentheses and prepend the processed string
-        return string_before_brackets + '__template__' + "__".join([i.strip().replace(" ","_").replace("*","_ptr_") for i in match.group(2).split(",")])
+        return string_before_brackets + '__template__' + "__".join(tmp)
 
     # Apply the regex replacement repeatedly until there are no more matches
     while re.search(pattern, code):

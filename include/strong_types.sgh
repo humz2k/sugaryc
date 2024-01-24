@@ -1,0 +1,35 @@
+#ifndef _STD_STRONG_TYPES_SGH_
+#define _STD_STRONG_TYPES_SGH_
+
+#include <assert.sgh>
+#include <string.sgh>
+
+module std;
+
+generated std.strong_type, std.make_strong <T, cond>{
+    typedef struct{
+        T raw;
+        unsigned int magic;
+    } std.strong_type<T, cond>;
+
+    static inline std.strong_type<T, cond> std.make_strong<T, cond>(T val){
+        assert(cond);
+        std.strong_type<T, cond> out;
+        out.raw = val;
+        out.magic = 0x23148201;
+        return out;
+    }
+
+    static inline T get(std.strong_type<T, cond> input){
+        T val = input.raw;
+        assert(input.magic == 0x23148201);
+        assert(cond);
+        return val;
+    }
+
+    static inline string __str__(std.strong_type<T, cond> input){
+        return to_str(input.get());
+    }
+}
+
+#endif

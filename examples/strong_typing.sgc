@@ -1,0 +1,40 @@
+#include <stdlib.sgh>
+#include <strong_types.sgh>
+
+template <T = int, unsigned int>{
+
+    typedef std.strong_type<T, val % 2 == 0> even<T>;
+    typedef std.strong_type<T, val % 2 == 1> odd<T>;
+
+    static inline even<T> make_even(T val){
+        return std.make_strong<T,val%2==0>(val);
+    }
+
+    static inline odd<T> make_odd(T val){
+        return std.make_strong<T,val%2==1>(val);
+    }
+
+    static inline odd<T> increment(even<T> val){
+        return make_odd(val.get() + 1);
+    }
+
+    static inline even<T> increment(odd<T> val){
+        return make_even(val.get() + 1);
+    }
+
+}
+
+int main(){
+
+    even<int> my_even_int = make_even(2);
+    //even<int> my_incorrect_even_int = make_even(3); //fails at runtime
+    //even<int> my_odd_int = make_odd(3); //fails at compile time
+    //even<int> my_odd_int = increment(my_even_int); //fails at compile time
+    odd<int> my_odd_int = increment(my_even_int);
+    auto my_auto_int = increment(my_odd_int);
+    //odd<int> my_bad_odd_int = my_auto_int; //fails at compile time
+    println("even:",my_even_int.get());
+    println("odd:",my_odd_int);
+    return 0;
+}
+

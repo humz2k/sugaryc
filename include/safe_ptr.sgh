@@ -1,0 +1,34 @@
+#ifndef _STD_SAFE_PTR_SGH_
+#define _STD_SAFE_PTR_SGH_
+
+#include <strong_types.sgh>
+#include <assert.sgh>
+
+module std;
+
+generated std.safe_ptr, std.alloc_safe <T>{
+
+    typedef struct{
+        std.strong_type<T*,val != NULL> raw;
+        unsigned int sz;
+    } std.safe_ptr<T>;
+
+    static inline std.safe_ptr<T> std.alloc_safe<T>(unsigned int sz){
+        T* tmp = (T*)GC_malloc(sz * sizeof(T));
+        std.safe_ptr<T> out;
+        out.raw = std.make_strong<T*,val != NULL>(tmp);
+        out.sz = sz;
+        return out;
+    }
+
+    static inline T* __index__(std.safe_ptr<T> ptr, int* idxs, int n){
+        assert(n == 1);
+        T* raw = ptr.raw.get();
+        int idx = idxs[0];
+        assert(idx < (ptr.sz));
+        return &raw[idx];
+    }
+
+}
+
+#endif

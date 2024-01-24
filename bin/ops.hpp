@@ -199,6 +199,8 @@ extern "C" void exit(int);
  
 #define __bool_true_false_are_defined 1
 
+#define NULL nullptr
+
 //#ifndef NULL
 
 //#endif

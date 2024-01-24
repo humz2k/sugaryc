@@ -1,17 +1,5 @@
-#include <lists.sgh>
-#include <range.sgh>
-
+#include <stdlib.sgh>
 
 int main(){
-
-    auto my_list = std.make_list<int>();
-    my_list.append(5);
-    my_list.append(10);
-    my_list.append(20);
-
-    foreach(auto i in my_list){
-        println(i);
-    }
-
     return 0;
 }
