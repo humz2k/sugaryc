@@ -29,6 +29,10 @@ generated std.safe_ptr, std.alloc_safe <T>{
         return &raw[idx];
     }
 
+    static inline T* get(std.safe_ptr<T> ptr){
+        return ptr.raw.get();
+    }
+
 }
 
 #endif
