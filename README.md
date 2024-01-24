@@ -6,25 +6,39 @@ Add `bin` to path, then compile with `sgcc`. For example, `sgcc my_file.sgc -o a
 
 `usage: sgcc [-h] [-o <output>] [-cxx <cxx>] [-c] [-O <opt>] [--echo] [-I <I> [<I> ...]] [-L <L> [<L> ...]] [-l <l> [<l> ...]] [--no-parallel] [--save-temps] <source> [<source> ...]`
 
+See `examples` for code samples.
+
+Sneak peak:
+
 ```
-struct my_struct{
- int a;
-};
-
-typedef struct my_struct* my_object;
-
-void set_a(my_object obj, int a){
- obj->a = a;
-}
-
-int get_a(my_object obj){
- return obj->a;
-}
+#include <stdlib.sgh>
+#include <string.sgh>
+#include <assert.sgh>
+#include <lists.sgh>
+#include <safe_ptr.sgh>
+#include <range.sgh>
 
 int main(){
- my_object obj = (my_object)malloc(sizeof(struct my_struct));
- obj.set_a(10);
- int a = obj.get_a();
- free(obj);
- return 0;
+
+    auto my_list = std.make_list<int>();
+    my_list.append(1);
+    my_list.append(2);
+    println(my_list);
+
+    foreach(int i in my_list){
+        println(i);
+    }
+
+    foreach(auto i in range(10)){
+        println(i);
+    }
+
+    auto my_safe_ptr = std.alloc_safe<float>(10);
+    my_safe_ptr[0] = 0;
+    my_safe_ptr[1] = 1;
+    my_safe_ptr[2] = 2;
+    println(my_safe_ptr[0],my_safe_ptr[1],my_safe_ptr[2]);
+
+    return 0;
 }
+```
