@@ -5,19 +5,20 @@
 //#include <lists.sgh>
 
 
-template<T1 = int, float>{ 
+template<T = int, float>{ 
 
-    //template<T1 = int, float>{
+    template<T1 = int, float>{
 
         struct template_1<T1>{
             T1 a;
         }
 
-        struct my_struct< T1 >{
-            T1 a;
+        struct my_struct< T, struct template_1<T1> >{
+            T a;
+            struct template_1<T1> b;
         }
 
-    //}
+    }
 
 }
 

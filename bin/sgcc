@@ -84,7 +84,7 @@ def replace_innermost_brackets(code):
         macros.append(string_before_brackets)
 
         # Replace angle brackets with parentheses and prepend the processed string
-        return string_before_brackets + '__template__' + "_".join([i.strip() for i in match.group(2).split(",")])
+        return string_before_brackets + '__template__' + "__".join([i.strip().replace(" ","_") for i in match.group(2).split(",")])
 
     # Apply the regex replacement repeatedly until there are no more matches
     while re.search(pattern, code):
