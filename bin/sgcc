@@ -31,11 +31,22 @@ class KernelFixer(c_ast.NodeVisitor):
         #print(node)
         #exit()
 
+def replace_T(code, replacement, T):
+    # Regex pattern to match string literals or \bT\b
+    pattern = r'\"(?:\\.|[^"\\])*\"|\'(?:\\.|[^\'\\])*\'|\b' + T + r'\b'
+
+    def replacer(match):
+        # If the match is T, replace it; otherwise, return the match unchanged
+        return replacement if match.group(0) == 'T' else match.group(0)
+
+    return re.sub(pattern, replacer, code)
+
 def handle_templates(raw):
     #print(raw)
     out = re.search(r'\btemplate\b<\b.+\=(.*)>.?\{', raw)
     if out is None:
         return raw
+    template_str = out.string[out.span()[0]:out.span()[1]]
     func = raw[out.span()[1]:]
     out_func = ""
     count = 0
@@ -47,22 +58,47 @@ def handle_templates(raw):
         if count < 0:
             break
         out_func += i
-    raw = raw.replace(out_func,"").replace(out.string[out.span()[0]:out.span()[1]]+"}","")
+    template_args = "".join(("".join(template_str.split("<")[1:])).split(">")[:-1])
+    template_T = template_args.split("=")[0].strip()
+    types = [i.strip() for i in template_args.split("=")[1].split(",")]
+    out_str = ""
+    for t in types:
+        out_str += replace_T(out_func,t,template_T) + "\n"
+    to_replace = template_str + out_func + "}"
+    raw = raw.replace(to_replace,out_str)
     return handle_templates(raw)
-    #print(out_func)
+
+def handle_struct_templates(raw):
+    #print(raw)
+    return raw
 
 
 def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, echo = False, openmp = True):
 
-    print(inp)
-    with open(inp,"r") as f:
+    tmp_file = inp + "__tmp1_sgcc.tmp"
+    cpp_args = ['-E',r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"include")] + includes + ['-xc',inp,'-o',tmp_file]
+    cpp_call = "gcc-13 " + " ".join(cpp_args)
+    if echo:
+        print(cpp_call)
+    os.system(cpp_call)
+
+    with open(tmp_file,"r") as f:
         raw = f.read()
-    print(handle_templates(raw))
-    exit()
+    raw = handle_templates(raw)
+    raw = handle_struct_templates(raw)
+    print(raw)
+    #exit()
+
+    with open(tmp_file,"w") as f:
+        f.write(raw)
+
+    #exit()
     
-    ast = parse_file(inp, use_cpp=True,
-        cpp_path='gcc-13',
-        cpp_args=['-E',r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"include")] + includes + ['-xc'])
+    #ast = parse_file(inp, use_cpp=True,
+    #    cpp_path='gcc-13',
+    #    cpp_args=['-E',r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"include")] + includes + ['-xc'])
+    
+    ast = parse_file(tmp_file, use_cpp=False)
     
     generator = c_generator.CGenerator()
 

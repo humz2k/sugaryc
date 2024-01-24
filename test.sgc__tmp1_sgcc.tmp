@@ -1,0 +1,32 @@
+# 0 "test.sgc"
+# 0 "<built-in>"
+# 0 "<command-line>"
+# 1 "test.sgc"
+
+
+
+
+
+
+
+
+
+    struct my_struct<int>{
+        int a;
+        int b;
+    }
+
+
+
+
+    struct my_struct<float>{
+        float a;
+        float b;
+    }
+
+
+
+
+int main(){
+    return 0;
+}

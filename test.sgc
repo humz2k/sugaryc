@@ -1,14 +1,15 @@
-#include <stdlib.sgh>
-#include <string.sgh>
-#include <ndarray.sgh>
-#include <math.sgh>
-#include <lists.sgh>
+//#include <stdlib.sgh>
+//#include <string.sgh>
+//#include <ndarray.sgh>
+//#include <math.sgh>
+//#include <lists.sgh>
 
 
 template<T = int, float>{ 
 
-    T test(T i){
-        return i;
+    struct my_struct<T>{
+        T a;
+        T b;
     }
 
 }

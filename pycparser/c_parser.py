@@ -926,7 +926,11 @@ class CParser(PLYParser):
                             | struct_or_union_specifier
                             | type_specifier_no_typeid
                             | atomic_specifier
+                            | struct_or_union_specifier LT type_specifier GT
         """
+        if len(p > 2):
+            print(p[1])
+            exit()
         p[0] = p[1]
 
     # See section 6.7.2.4 of the C11 standard.
