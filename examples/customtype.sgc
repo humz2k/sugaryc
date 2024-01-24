@@ -10,7 +10,7 @@ struct my_struct{
 typedef std.safe_ptr<struct my_struct> my_object;
 
 my_object make_my_object(void){
-    my_object out = std.alloc_safe<struct my_struct>(1);
+    my_object out = std.alloc_safe<struct my_struct>();
     out.get()->a = 0;
     return out;
 }
