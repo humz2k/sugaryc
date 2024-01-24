@@ -1,0 +1,34 @@
+#include <stdlib.sgh>
+#include <optional.sgh>
+
+std.optional<int> is_greater_than_5_or_null(int input){
+    if (input > 5){
+        return std.make_optional<int>(input);
+    }
+    return std.nullopt<int>();
+}
+
+int main(){
+
+    std.optional<int> i = std.make_optional<int>(10);
+    println(i.value_or(0));
+
+    std.optional<int> j = std.nullopt<int>();
+    println(j.value_or(0));
+
+    println(is_greater_than_5_or_null(10));
+    println(is_greater_than_5_or_null(5));
+    //println(is_greater_than_5_or_null(5).value()); //fails at runtime
+
+    auto ilt5 = is_greater_than_5_or_null(0);
+    if (ilt5.has_value()){
+        println(ilt5.value());
+    }
+
+    auto igt5 = is_greater_than_5_or_null(100);
+    if (igt5.has_value()){
+        println(igt5.value());
+    }
+
+    return 0;
+}

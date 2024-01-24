@@ -2,6 +2,7 @@
 #define _STD_OPTIONAL_H_
 
 #include <print.sgh>
+#include <string.sgh>
 
 module std;
 
@@ -35,6 +36,17 @@ generated std.optional, std.make_optional, std.nullopt <T>{
             printf("optional_failed\n");exit(1);
         }
         return opt.raw;
+    }
+
+    static inline string __str__(std.optional<T> opt){
+        if (opt.exists){
+            return to_str(opt.raw);
+        }
+        return "nullopt";
+    }
+
+    static inline bool has_value(std.optional<T> opt){
+        return opt.exists;
     }
 
 }
