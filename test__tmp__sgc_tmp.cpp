@@ -545,10 +545,10 @@ struct list_struct__template__int
   int length;
   int n_allocated;
 };
-typedef struct list_struct__template__int *list__template__int;
-inline static list__template__int make_list__template__int(void)
+typedef struct list_struct__template__int *std__list__template__int;
+inline static std__list__template__int std__make_list__template__int(void)
 {
-  list__template__int out = (list__template__int) GC_malloc(sizeof(struct list_struct__template__int));
+  std__list__template__int out = (std__list__template__int) GC_malloc(sizeof(struct list_struct__template__int));
   if (!__neq__(out, nullptr))
   {
     printf("%s: FAILED\n", "out != NULL");
@@ -567,7 +567,7 @@ inline static list__template__int make_list__template__int(void)
   return out;
 }
 
-inline static void append(list__template__int lst, int val)
+inline static void append(std__list__template__int lst, int val)
 {
   if (!__neq__(lst, nullptr))
   {
@@ -603,7 +603,7 @@ inline static void append(list__template__int lst, int val)
   return;
 }
 
-inline static int pop(list__template__int lst)
+inline static int pop(std__list__template__int lst, int idx)
 {
   if (!__neq__(lst, nullptr))
   {
@@ -611,14 +611,19 @@ inline static int pop(list__template__int lst)
     exit(1);
   }
   ;
-  if (!__gt__(lst->length, 0))
+  if (!__lt__(idx, lst->length))
   {
-    printf("%s: FAILED\n", "lst->length > 0");
+    printf("%s: FAILED\n", "idx < lst->length");
     exit(1);
   }
   ;
+  int out = __index_wrapper__(lst->raw, idx);
+  for (int i = idx; __lt__(i, __sub__(lst->length, 1)); i++)
+  {
+    __index_wrapper__(lst->raw, i) = __index_wrapper__(lst->raw, __add__(i, 1));
+  }
+
   lst->length--;
-  int out = __index_wrapper__(lst->raw, lst->length);
   if (__gt__(__sub__(lst->n_allocated, lst->length), 10))
   {
     lst->n_allocated = __sub__(lst->n_allocated, 10);
@@ -639,7 +644,24 @@ inline static int pop(list__template__int lst)
   return out;
 }
 
-inline static int len(list__template__int lst)
+inline static int pop(std__list__template__int lst)
+{
+  if (!__neq__(lst, nullptr))
+  {
+    printf("%s: FAILED\n", "lst != NULL");
+    exit(1);
+  }
+  ;
+  if (!__gt__(lst->length, 0))
+  {
+    printf("%s: FAILED\n", "lst->length > 0");
+    exit(1);
+  }
+  ;
+  return pop(lst, __sub__(lst->length, 1));
+}
+
+inline static int len(std__list__template__int lst)
 {
   if (!__neq__(lst, nullptr))
   {
@@ -650,8 +672,48 @@ inline static int len(list__template__int lst)
   return lst->length;
 }
 
-inline static int *__index__(list__template__int lst, int *idxs, int n)
+inline static void insert(std__list__template__int lst, int idx, int value)
 {
+  if (!__neq__(lst, nullptr))
+  {
+    printf("%s: FAILED\n", "lst != NULL");
+    exit(1);
+  }
+  ;
+  if (!__lt__(idx, lst->length))
+  {
+    printf("%s: FAILED\n", "idx < lst->length");
+    exit(1);
+  }
+  ;
+  if (!__lt__(__add__(lst->length, 1), lst->n_allocated))
+  {
+    lst->n_allocated = __add__(lst->n_allocated, 10);
+    lst->raw = (int *) GC_realloc(lst->raw, __mul__(sizeof(int), lst->n_allocated));
+    if (!__neq__(lst->raw, nullptr))
+    {
+      printf("%s: FAILED\n", "lst->raw != NULL");
+      exit(1);
+    }
+    ;
+  }
+  for (int i = __sub__(lst->length, 1); __ge__(i, idx); i--)
+  {
+    __index_wrapper__(lst->raw, __add__(i, 1)) = __index_wrapper__(lst->raw, i);
+  }
+
+  __index_wrapper__(lst->raw, idx) = value;
+  lst->length++;
+}
+
+inline static int *__index__(std__list__template__int lst, int *idxs, int n)
+{
+  if (!__neq__(lst, nullptr))
+  {
+    printf("%s: FAILED\n", "lst != NULL");
+    exit(1);
+  }
+  ;
   if (!__eq__(n, 1))
   {
     printf("%s: FAILED\n", "n == 1");
@@ -665,20 +727,43 @@ inline static int *__index__(list__template__int lst, int *idxs, int n)
     exit(1);
   }
   ;
+  if (!__neq__(lst->raw, nullptr))
+  {
+    printf("%s: FAILED\n", "lst->raw != NULL");
+    exit(1);
+  }
+  ;
   return &__index_wrapper__(lst->raw, idx);
+}
+
+inline static string __str__(std__list__template__int lst)
+{
+  string out = "[";
+  for (int i = 0; __lt__(i, __sub__(lst->length, 1)); i++)
+  {
+    out = __add__(out, __add__(to_str(__index_wrapper__(lst->raw, i)), ", "));
+  }
+
+  if (__gt__(lst->length, 0))
+  {
+    out = __add__(out, to_str(__index_wrapper__(lst->raw, __sub__(lst->length, 1))));
+  }
+  out = __add__(out, "]");
+  return out;
 }
 
 int main()
 {
-  auto my_list = make_list__template__int();
-  printf("len = %d\n", len(my_list));
-  append(my_list, 1);
-  println(__index_wrapper__(my_list, 0));
-  __index_wrapper__(my_list, 0) = 1;
-  println(__index_wrapper__(my_list, 0));
-  printf("len = %d\n", len(my_list));
-  printf("%d\n", pop(my_list));
-  printf("len = %d\n", len(my_list));
+  auto my_list = std__make_list__template__int();
+  println(my_list);
+  for (int i = 0; __lt__(i, 5); i++)
+  {
+    append(my_list, i);
+    println(my_list, len(my_list));
+  }
+
+  insert(my_list, 1, 10);
+  println(my_list, len(my_list));
   return 0;
 }
 
