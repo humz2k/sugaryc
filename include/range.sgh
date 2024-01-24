@@ -1,0 +1,53 @@
+#ifndef _FOREACH_SGH_
+#define _FOREACH_SGH_
+
+typedef struct {
+    int start;
+    int stop;
+    int step;
+    int cur;
+} range_t;
+
+typedef range_t* range_obj;
+
+static inline range_obj __iter__(range_obj r){
+    return r;
+}
+
+static inline int __start__(range_obj r){
+    r->cur = r->start;
+    return r->cur;
+}
+
+static inline bool __done__(range_obj r){
+    return r->cur >= r->stop;
+}
+
+static inline int __next__(range_obj r){
+    r->cur += r->step;
+    return r->cur;
+}
+
+static inline range_obj range(int stop){
+    range_obj out = (range_obj)GC_malloc(sizeof(range_t));
+    out->start = 0;
+    out->stop = stop;
+    out->step = 1;
+    return out;
+}
+static inline range_obj range(int start, int stop){
+    range_obj out = (range_obj)GC_malloc(sizeof(range_t));
+    out->start = start;
+    out->stop = stop;
+    out->step = 1;
+    return out;
+}
+static inline range_obj range(int start, int stop, int step){
+    range_obj out = (range_obj)GC_malloc(sizeof(range_t));
+    out->start = start;
+    out->stop = stop;
+    out->step = step;
+    return out;
+}
+
+#endif

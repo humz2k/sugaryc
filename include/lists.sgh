@@ -1,68 +1,136 @@
-#ifndef _LISTS_SGH_
-#define _LISTS_SGH_
+#ifndef _STD_LIST_SGH_
+#define _STD_LIST_SGH_
 
-#define _COMBINE(a,b) a ## b
-#define _combine(a, b) _COMBINE(a, b)
-
+#include <stdlib.sgh>
+#include <assert.sgh>
 #include <string.sgh>
 
-struct void_list_struct;
-typedef struct void_list_struct* void_list;
+module std;
 
-void_list make_void_list(void);
+#define list_base_n 10
 
-void** __index__(void_list lst, int* idxs, int nidxs);
+generated std.list, std.make_list <T>{
 
-int append(void_list lst, void* item);
+    struct list_struct<T>{
+        T* raw;
+        int length;
+        int n_allocated;
+        int cur;
+    };
 
-void* pop(void_list lst);
-void* pop(void_list lst, int idx);
-int insert(void_list lst, int idx, void* item);
-int len(void_list lst);
+    typedef struct list_struct<T>* std.list<T>;
 
-#define list(t) _combine(t,_list)
+    static inline std.list<T> std.make_list<T>(void){
+        std.list<T> out = (std.list<T>)GC_malloc(sizeof(struct list_struct<T>));
+        assert(out != NULL);
+        out->length = 0;
+        out->n_allocated = list_base_n;
+        out->raw = (T*)GC_malloc(sizeof(T) * list_base_n);
+        assert(out->raw != NULL);
+        return out;
+    }
 
-#define inst_list(t,name) struct _combine(name,_struct){\
-                            void_list raw_list;\
-                        };\
-                        typedef struct _combine(name,_struct)* name;\
-                        static inline name _combine(make_,name)(void){\
-                            name out = (name)GC_malloc(sizeof(struct _combine(name,_struct)));\
-                            out->raw_list = make_void_list();\
-                            return out;\
-                        }\
-                        static inline t* __index__(name my_list,int* idxs, int nidxs){\
-                            return (t*)__index__(my_list->raw_list,idxs,nidxs);\
-                        }\
-                        static inline int append(name my_list, t item){\
-                            return append(my_list->raw_list,(void*)item);\
-                        }\
-                        static inline t pop(name my_list){\
-                            return (t)pop(my_list->raw_list);\
-                        }\
-                        static inline t pop(name my_list, int idx){\
-                            return (t)pop(my_list->raw_list,idx);\
-                        }\
-                        static inline int insert(name my_list, int idx, t item){\
-                            return insert(my_list->raw_list,idx,(void*)item);\
-                        }\
-                        static inline int len(name my_list){\
-                            return len(my_list->raw_list);\
-                        }\
-                        static inline string __str__(name my_list){\
-                            string out = "[";\
-                            int length = len(my_list);\
-                            for (int i = 0; i < length - 1; i++){\
-                                out += to_str(my_list[i]) + ", ";\
-                            }\
-                            if (length > 0){\
-                                out += to_str(my_list[length - 1]);\
-                            }\
-                            out += "]";\
-                            return out;\
-                        }
+    static inline void append(std.list<T> lst, T val){
+        assert(lst != NULL);
+        assert(lst->length >= 0);
+        if (!(lst->length < lst->n_allocated)){
+            lst->n_allocated += list_base_n;
+            lst->raw = (T*)GC_realloc(lst->raw,sizeof(T) * lst->n_allocated);
+            assert(lst->raw != NULL);
+        }
+        assert(lst->length < lst->n_allocated);
+        lst->raw[lst->length] = val;
+        lst->length++;
+        return;
+    }
 
+    static inline T pop(std.list<T> lst, int idx){
+        assert(lst != NULL);
+        assert(idx < lst->length);
+        T out = lst->raw[idx];
+        for (int i = idx; i < (lst->length-1); i++){
+            lst->raw[i] = lst->raw[i+1];
+        }
+        lst->length--;
+        if ((lst->n_allocated - lst->length) > list_base_n){
+            lst->n_allocated -= list_base_n;
+            assert(lst->n_allocated > 0);
+            assert(lst->n_allocated >= lst->length);
+            lst->raw = (T*)GC_realloc(lst->raw,sizeof(T) * lst->n_allocated);
+        }
+        return out;
+    }
 
-inst_list(string,string_list);
+    static inline T pop(std.list<T> lst){
+        assert(lst != NULL);
+        assert(lst->length > 0);
+        return pop(lst,lst->length-1);
+    }
+
+    static inline int len(std.list<T> lst){
+        assert(lst != NULL);
+        return lst->length;
+    }
+
+    static inline void insert(std.list<T> lst, int idx, T value){
+        assert(lst != NULL);
+        assert(idx < lst->length);
+        if (!((lst->length+1) < lst->n_allocated)){
+            lst->n_allocated += list_base_n;
+            lst->raw = (T*)GC_realloc(lst->raw,sizeof(T) * lst->n_allocated);
+            assert(lst->raw != NULL);
+        }
+        for (int i = lst->length-1; i >= idx; i--){
+            lst->raw[i+1] = lst->raw[i];
+        }
+        lst->raw[idx] = value;
+        lst->length++;
+
+    }
+
+    static inline T* __index__(std.list<T> lst, int* idxs, int n){
+        assert(lst != NULL);
+        assert(n == 1);
+        int idx = idxs[0];
+        assert(idx < lst->length);
+        assert(lst->raw != NULL);
+        return &(lst->raw[idx]);
+    }
+
+    static inline string __str__(std.list<T> lst){
+        string out = "[";
+        for (int i = 0; i < lst->length-1; i++){
+            out += to_str(lst->raw[i]) + ", ";
+        }
+        if (lst->length > 0){
+            out += to_str(lst->raw[lst->length-1]);
+        }
+        out += "]";
+        return out;
+    }
+
+    static inline std.list<T> __iter__(std.list<T> lst){
+        return lst;
+    }
+    
+    static inline T __start__(std.list<T> lst){
+        lst->cur = 0;
+        if (lst->length == 0){
+            T empty;
+            return empty;
+        }
+        return lst->raw[lst->cur];
+    }
+
+    static inline bool __done__(std.list<T> lst){
+        return lst->cur >= lst->length;
+    }
+
+    static inline T __next__(std.list<T> lst){
+        lst->cur++;
+        return lst->raw[lst->cur];
+    }
+
+}
 
 #endif

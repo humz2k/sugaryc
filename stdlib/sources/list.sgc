@@ -1,3 +1,0 @@
-#define list_t void
-#include "list.sgh"
-#undef list_t

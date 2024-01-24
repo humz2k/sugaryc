@@ -1,7 +1,0 @@
-#ifndef _FOREACH_SGH_
-#define _FOREACH_SGH_
-
-#define in ,
-#define foreach(i,arr) for (auto _iter = __iter__(arr), i = __start__(_iter); !__done__(_iter); i = __next__(_iter))
-
-#endif

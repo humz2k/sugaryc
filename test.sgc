@@ -1,132 +1,17 @@
-#include <stdlib.sgh>
-#include <assert.sgh>
-#include <string.sgh>
-
-module std;
-
-#define list_base_n 10
-
-generated std.list, std.make_list <T>{
-
-    struct list_struct<T>{
-        T* raw;
-        int length;
-        int n_allocated;
-    };
-
-    typedef struct list_struct<T>* std.list<T>;
-
-    static inline std.list<T> std.make_list<T>(void){
-        std.list<T> out = (std.list<T>)GC_malloc(sizeof(struct list_struct<T>));
-        assert(out != NULL);
-        out->length = 0;
-        out->n_allocated = list_base_n;
-        out->raw = (T*)GC_malloc(sizeof(T) * list_base_n);
-        assert(out->raw != NULL);
-        return out;
-    }
-
-    static inline void append(std.list<T> lst, T val){
-        assert(lst != NULL);
-        assert(lst->length >= 0);
-        if (!(lst->length < lst->n_allocated)){
-            lst->n_allocated += list_base_n;
-            lst->raw = (T*)GC_realloc(lst->raw,sizeof(T) * lst->n_allocated);
-            assert(lst->raw != NULL);
-        }
-        assert(lst->length < lst->n_allocated);
-        lst->raw[lst->length] = val;
-        lst->length++;
-        return;
-    }
-
-    static inline T pop(std.list<T> lst, int idx){
-        assert(lst != NULL);
-        assert(idx < lst->length);
-        T out = lst->raw[idx];
-        for (int i = idx; i < (lst->length-1); i++){
-            lst->raw[i] = lst->raw[i+1];
-        }
-        lst->length--;
-        if ((lst->n_allocated - lst->length) > list_base_n){
-            lst->n_allocated -= list_base_n;
-            assert(lst->n_allocated > 0);
-            assert(lst->n_allocated >= lst->length);
-            lst->raw = (T*)GC_realloc(lst->raw,sizeof(T) * lst->n_allocated);
-        }
-        return out;
-    }
-
-    static inline T pop(std.list<T> lst){
-        assert(lst != NULL);
-        assert(lst->length > 0);
-        return pop(lst,lst->length-1);
-    }
-
-    static inline int len(std.list<T> lst){
-        assert(lst != NULL);
-        return lst->length;
-    }
-
-    static inline void insert(std.list<T> lst, int idx, T value){
-        assert(lst != NULL);
-        assert(idx < lst->length);
-        if (!((lst->length+1) < lst->n_allocated)){
-            lst->n_allocated += list_base_n;
-            lst->raw = (T*)GC_realloc(lst->raw,sizeof(T) * lst->n_allocated);
-            assert(lst->raw != NULL);
-        }
-        for (int i = lst->length-1; i >= idx; i--){
-            lst->raw[i+1] = lst->raw[i];
-        }
-        lst->raw[idx] = value;
-        lst->length++;
-
-    }
-
-    static inline T* __index__(std.list<T> lst, int* idxs, int n){
-        assert(lst != NULL);
-        assert(n == 1);
-        int idx = idxs[0];
-        assert(idx < lst->length);
-        assert(lst->raw != NULL);
-        return &(lst->raw[idx]);
-    }
-
-    static inline string __str__(std.list<T> lst){
-        string out = "[";
-        for (int i = 0; i < lst->length-1; i++){
-            out += to_str(lst->raw[i]) + ", ";
-        }
-        if (lst->length > 0){
-            out += to_str(lst->raw[lst->length-1]);
-        }
-        out += "]";
-        return out;
-    }
-
-}
+#include <lists.sgh>
+#include <range.sgh>
 
 
 int main(){
 
     auto my_list = std.make_list<int>();
-    println(my_list);
-    for (int i = 0; i < 5; i++){
-        my_list.append(i);
-        println(my_list,len(my_list));
+    my_list.append(5);
+    my_list.append(10);
+    my_list.append(20);
+
+    foreach(auto i in my_list){
+        println(i);
     }
-    my_list.insert(1,10);
-    println(my_list,len(my_list));
-    //println(my_list,len(my_list));
-    //println(my_list.pop(1));
-    //println(my_list,len(my_list));
-    //println(my_list[0]);
-    //my_list[0] = 5;
-    //println(my_list[0]);
-    //printf("len = %d\n",my_list.len());
-    //printf("%d\n",my_list.pop());
-    //printf("len = %d\n",my_list.len());
 
     return 0;
 }

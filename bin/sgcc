@@ -98,6 +98,8 @@ def handle_generated(raw):
     global generateds
     #print(raw)
     out = re.search(r'\bgenerated\b(.+)<(.*)>.?\{', raw)
+    if out is None:
+        return raw
     gen_strs = [i.strip() for i in out.group(1).split(",")]
     Ts = [i.strip() for i in out.group(2).split(",")]
     func = raw[out.span()[1]:]
@@ -152,6 +154,34 @@ def handle_modules(raw):
     raw = re.sub(pattern,out + "__",raw)
     return raw
 
+n_foreach = 0
+
+def replace_foreach(code):
+    # Pattern to match the innermost angle brackets
+    pattern = r"\bforeach\s*\((.*)\)"
+
+    if re.search(pattern,code) is None:
+        return code
+
+    to_gen = []
+    # Function to replace angle brackets with parentheses
+    def replacer(match):
+        global n_foreach
+        n_foreach += 1
+        # Extract the string before the angle brackets
+        l,r = match.group(1).split(" in ")
+        var_name = l.split(" ")[-1]
+        itername = "__iter_foreach_" + str(n_foreach)
+        out = "auto " + itername + " = __iter__(" + r + "); for(" + l + " = __start__(" + itername + "); !__done__(" + itername + "); " + var_name + " = __next__(" + itername + "))"
+        return out
+
+    # Apply the regex replacement repeatedly until there are no more matches
+    while re.search(pattern, code):
+        code = re.sub(pattern, replacer, code)
+    return replace_foreach(code)
+
+def handle_foreach(raw):
+    return replace_foreach(raw)
 
 def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, echo = False, openmp = True):
 
@@ -168,6 +198,7 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
     raw = handle_templates(raw)
     raw = handle_generated(raw)
     raw = handle_struct_templates(raw)
+    raw = handle_foreach(raw)
     raw = "#define __generate(...) \n #define bool _Bool \n #define true 1 \n #define false 0 \n" + raw
 
     with open(tmp_file,"w") as f:
