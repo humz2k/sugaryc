@@ -1,5 +1,0 @@
-#include <stdlib.sgh>
-
-int main(){
-    return 0;
-}
