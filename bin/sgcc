@@ -5,6 +5,7 @@ import os
 sys.path = [os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))] + sys.path
 from pycparser import c_generator, parse_file, c_ast
 import argparse
+import re
 
 class KernelFixer(c_ast.NodeVisitor):
     def visit_Decl(self, node : c_ast.Decl):
@@ -30,7 +31,35 @@ class KernelFixer(c_ast.NodeVisitor):
         #print(node)
         #exit()
 
+def handle_templates(raw):
+    #print(raw)
+    out = re.search(r'\btemplate\b<\b.+\=(.*)>.?\{', raw)
+    if out is None:
+        return raw
+    func = raw[out.span()[1]:]
+    out_func = ""
+    count = 0
+    for i in func:
+        if i == "{":
+            count += 1
+        if i == "}":
+            count -= 1
+        if count < 0:
+            break
+        out_func += i
+    raw = raw.replace(out_func,"").replace(out.string[out.span()[0]:out.span()[1]]+"}","")
+    return handle_templates(raw)
+    #print(out_func)
+
+
 def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, echo = False, openmp = True):
+
+    print(inp)
+    with open(inp,"r") as f:
+        raw = f.read()
+    print(handle_templates(raw))
+    exit()
+    
     ast = parse_file(inp, use_cpp=True,
         cpp_path='gcc-13',
         cpp_args=['-E',r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"include")] + includes + ['-xc'])

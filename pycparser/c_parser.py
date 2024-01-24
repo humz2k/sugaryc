@@ -877,6 +877,22 @@ class CParser(PLYParser):
                                     | TYPEDEF
                                     | _THREAD_LOCAL
         """
+        #if len(p) == 4:
+        #    print("FOUND TEMPLATE")
+        #    p[0] = p[1] + p[2] + p[3] + "\n"
+        #    return
+        #if len(p) > 2:
+            #print("FOUND TEMPLATE")
+            #exit()
+            #print(len(p))
+        #    for i in p[3]:
+                #print(i)
+        #        self._add_typedef_name(i.name,i.coord)
+            #exit()
+        #    p[0] = p[1] + p[2] + " " + ",".join(["typename " + i.name for i in p[3]]) + " " + p[4] + "\n"
+        #    return
+            #print(p[1],p[2],p[3],p[4])
+            #exit()
         if(p[1] == "extern"):
             p[1] = 'extern "C"'
         p[0] = p[1]
@@ -1202,12 +1218,14 @@ class CParser(PLYParser):
     def p_direct_xxx_declarator_1(self, p):
         """ direct_xxx_declarator   : yyy
         """
+        #print("decl???")
         p[0] = c_ast.TypeDecl(
             declname=p[1],
             type=None,
             quals=None,
             align=None,
             coord=self._token_coord(p, 1))
+        #print(p[0])
 
     @parameterized(('id', 'ID'), ('typeid', 'TYPEID'))
     def p_direct_xxx_declarator_2(self, p):

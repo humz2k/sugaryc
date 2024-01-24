@@ -2,6 +2,6 @@
 #define _FOREACH_SGH_
 
 #define in ,
-//#define foreach(i,arr) for (auto i = arr.__start__(); arr.__stop__(); i = arr.__next__())
+#define foreach(i,arr) for (auto _iter = __iter__(arr), i = __start__(_iter); !__done__(_iter); i = __next__(_iter))
 
 #endif
