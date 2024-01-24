@@ -1,30 +1,84 @@
-//#include <stdlib.sgh>
-//#include <string.sgh>
-//#include <ndarray.sgh>
-//#include <math.sgh>
-//#include <lists.sgh>
+#include <stdlib.sgh>
+#include <assert.sgh>
 
+module std;
 
-template<T = int, float>{ 
+#define list_base_n 10
 
-    template<T1 = int, float>{
+generated list, make_list <T>{
 
-        struct template_1<T1>{
-            T1 a;
+    struct list_struct<T>{
+        T* raw;
+        int length;
+        int n_allocated;
+    };
+
+    typedef struct list_struct<T>* list<T>;
+
+    static inline list<T> make_list<T>(void){
+        list<T> out = (list<T>)GC_malloc(sizeof(struct list_struct<T>));
+        assert(out != NULL);
+        out->length = 0;
+        out->n_allocated = list_base_n;
+        out->raw = (T*)GC_malloc(sizeof(T) * list_base_n);
+        assert(out->raw != NULL);
+        return out;
+    }
+
+    static inline void append(list<T> lst, T val){
+        assert(lst != NULL);
+        assert(lst->length >= 0);
+        if (!(lst->length < lst->n_allocated)){
+            lst->n_allocated += list_base_n;
+            lst->raw = (T*)GC_realloc(lst->raw,sizeof(T) * lst->n_allocated);
+            assert(lst->raw != NULL);
         }
+        assert(lst->length < lst->n_allocated);
+        lst->raw[lst->length] = val;
+        lst->length++;
+        return;
+    }
 
-        struct my_struct< T, struct template_1<T1> >{
-            T a;
-            struct template_1<T1> b;
+    static inline T pop(list<T> lst){
+        assert(lst != NULL);
+        assert(lst->length > 0);
+        lst->length--;
+        T out = lst->raw[lst->length];
+        if ((lst->n_allocated - lst->length) > list_base_n){
+            lst->n_allocated -= list_base_n;
+            assert(lst->n_allocated > 0);
+            assert(lst->n_allocated >= lst->length);
+            lst->raw = (T*)GC_realloc(lst->raw,sizeof(T) * lst->n_allocated);
         }
+        return out;
+    }
 
+    static inline int len(list<T> lst){
+        assert(lst != NULL);
+        return lst->length;
+    }
+
+    static inline T* __index__(list<T> lst, int* idxs, int n){
+        assert(n == 1);
+        int idx = idxs[0];
+        assert(idx < lst->length);
+        return &(lst->raw[idx]);
     }
 
 }
 
+
 int main(){
 
-    struct my_struct<int> a;
+    auto my_list = make_list<int>();
+    printf("len = %d\n",len(my_list));
+    my_list.append(1);
+    println(my_list[0]);
+    my_list[0] = 1;
+    println(my_list[0]);
+    printf("len = %d\n",my_list.len());
+    printf("%d\n",my_list.pop());
+    printf("len = %d\n",my_list.len());
 
     return 0;
 }

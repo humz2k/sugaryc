@@ -1,0 +1,42 @@
+#ifndef _STD_OPTIONAL_H_
+#define _STD_OPTIONAL_H_
+
+#include <print.sgh>
+
+module std;
+
+generated std.optional, std.make_optional, std.nullopt <T>{
+    
+    typedef struct{
+        T raw;
+        bool exists;
+    } std.optional<T>;
+
+    static inline std.optional<T> std.make_optional<T> (T in){
+        std.optional<T> out;
+        out.raw = in;
+        out.exists = true;
+        return out;
+    }
+
+    static inline std.optional<T> std.nullopt<T>(void){
+        std.optional<T> out;
+        out.exists = false;
+        return out;
+    }
+
+    static inline T value_or(std.optional<T> opt, T val){
+        if (opt.exists)return opt.raw;
+        return val;
+    }
+
+    static inline T value(std.optional<T> opt){
+        if (!opt.exists){
+            printf("optional_failed\n");exit(1);
+        }
+        return opt.raw;
+    }
+
+}
+
+#endif

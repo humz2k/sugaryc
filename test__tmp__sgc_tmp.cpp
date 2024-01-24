@@ -1,6 +1,8 @@
 
 #include <type_traits>
 
+#include <stdbool.h>
+
 template <typename T, typename T2>
 static inline typename std::common_type<T, T2>::type __add__(T t, T2 t2) {
     return t + t2;
@@ -128,6 +130,7 @@ static inline int _n_var_args(T i, Args... args){
 }
 
 extern "C" void* GC_malloc(int);
+extern "C" void* GC_realloc(void*,int);
 
 template <typename T>
 static inline void _vaptr_helper(T* out, int n){
@@ -177,6 +180,8 @@ extern "C" void exit(int);
 
 #define __global__ 
 
+#define __generate(...) 
+
 #define warpsize 32
 
 #define LAUNCH_KERNEL(func,numBlocks,blockSize,...) \
@@ -191,21 +196,489 @@ extern "C" void exit(int);
     }\
 }
 
+ 
+#define __bool_true_false_are_defined 1
+
 //#ifndef NULL
 
 //#endif
-int test(int i)
+extern "C" void *malloc(long unsigned int);
+extern "C" void free(void *);
+const char *__str__(const char *s);
+const char *__str__(float f);
+const char *__str__(double f);
+const char *__str__(short a);
+const char *__str__(int a);
+const char *__str__(long int a);
+const char *__str__(long long int a);
+struct _int_tuple;
+typedef struct _int_tuple *int_tuple;
+int_tuple make_int_tuple(int *raw, int length);
+const int *__index__(int_tuple t, int *idx, int nidx);
+int len(int_tuple t);
+const char *__str__(int_tuple t);
+typedef const char *string;
+string __add__(string left, string right);
+string __mul__(string left, int right);
+string __mul__(int left, string right);
+int __eq__(string left, string right);
+int __neq__(string left, string right);
+int len(string str);
+typedef struct 
 {
-  return i;
+  float x;
+  float y;
+} float2;
+inline static float2 make_float2(float x, float y)
+{
+  float2 out;
+  out.x = x;
+  out.y = y;
+  return out;
 }
 
-float test(float i)
+inline static string __str__(float2 vec)
 {
-  return i;
+  string out = __add__(__add__(__add__(__add__(__add__("float2", "{"), to_str(vec.x)), ", "), to_str(vec.y)), "}");
+  return out;
+}
+
+typedef struct 
+{
+  float x;
+  float y;
+  float z;
+} float3;
+inline static float3 make_float3(float x, float y, float z)
+{
+  float3 out;
+  out.x = x;
+  out.y = y;
+  out.z = z;
+  return out;
+}
+
+inline static string __str__(float3 vec)
+{
+  string out = __add__(__add__(__add__(__add__(__add__(__add__(__add__("float3", "{"), to_str(vec.x)), ", "), to_str(vec.y)), ", "), to_str(vec.z)), "}");
+  return out;
+}
+
+typedef struct 
+{
+  float x;
+  float y;
+  float z;
+  float w;
+} float4;
+inline static float4 make_float4(float x, float y, float z, float w)
+{
+  float4 out;
+  out.x = x;
+  out.y = y;
+  out.z = z;
+  out.w = w;
+  return out;
+}
+
+inline static string __str__(float4 vec)
+{
+  string out = __add__(__add__(__add__(__add__(__add__(__add__(__add__(__add__(__add__("float4", "{"), to_str(vec.x)), ", "), to_str(vec.y)), ", "), to_str(vec.z)), ", "), to_str(vec.w)), "}");
+  return out;
+}
+
+typedef struct 
+{
+  double x;
+  double y;
+} double2;
+inline static double2 make_double2(double x, double y)
+{
+  double2 out;
+  out.x = x;
+  out.y = y;
+  return out;
+}
+
+inline static string __str__(double2 vec)
+{
+  string out = __add__(__add__(__add__(__add__(__add__("double2", "{"), to_str(vec.x)), ", "), to_str(vec.y)), "}");
+  return out;
+}
+
+typedef struct 
+{
+  double x;
+  double y;
+  double z;
+} double3;
+inline static double3 make_double3(double x, double y, double z)
+{
+  double3 out;
+  out.x = x;
+  out.y = y;
+  out.z = z;
+  return out;
+}
+
+inline static string __str__(double3 vec)
+{
+  string out = __add__(__add__(__add__(__add__(__add__(__add__(__add__("double3", "{"), to_str(vec.x)), ", "), to_str(vec.y)), ", "), to_str(vec.z)), "}");
+  return out;
+}
+
+typedef struct 
+{
+  double x;
+  double y;
+  double z;
+  double w;
+} double4;
+inline static double4 make_double4(double x, double y, double z, double w)
+{
+  double4 out;
+  out.x = x;
+  out.y = y;
+  out.z = z;
+  out.w = w;
+  return out;
+}
+
+inline static string __str__(double4 vec)
+{
+  string out = __add__(__add__(__add__(__add__(__add__(__add__(__add__(__add__(__add__("double4", "{"), to_str(vec.x)), ", "), to_str(vec.y)), ", "), to_str(vec.z)), ", "), to_str(vec.w)), "}");
+  return out;
+}
+
+typedef struct 
+{
+  short x;
+  short y;
+} short2;
+inline static short2 make_short2(short x, short y)
+{
+  short2 out;
+  out.x = x;
+  out.y = y;
+  return out;
+}
+
+inline static string __str__(short2 vec)
+{
+  string out = __add__(__add__(__add__(__add__(__add__("short2", "{"), to_str(vec.x)), ", "), to_str(vec.y)), "}");
+  return out;
+}
+
+typedef struct 
+{
+  short x;
+  short y;
+  short z;
+} short3;
+inline static short3 make_short3(short x, short y, short z)
+{
+  short3 out;
+  out.x = x;
+  out.y = y;
+  out.z = z;
+  return out;
+}
+
+inline static string __str__(short3 vec)
+{
+  string out = __add__(__add__(__add__(__add__(__add__(__add__(__add__("short3", "{"), to_str(vec.x)), ", "), to_str(vec.y)), ", "), to_str(vec.z)), "}");
+  return out;
+}
+
+typedef struct 
+{
+  short x;
+  short y;
+  short z;
+  short w;
+} short4;
+inline static short4 make_short4(short x, short y, short z, short w)
+{
+  short4 out;
+  out.x = x;
+  out.y = y;
+  out.z = z;
+  out.w = w;
+  return out;
+}
+
+inline static string __str__(short4 vec)
+{
+  string out = __add__(__add__(__add__(__add__(__add__(__add__(__add__(__add__(__add__("short4", "{"), to_str(vec.x)), ", "), to_str(vec.y)), ", "), to_str(vec.z)), ", "), to_str(vec.w)), "}");
+  return out;
+}
+
+typedef struct 
+{
+  int x;
+  int y;
+} int2;
+inline static int2 make_int2(int x, int y)
+{
+  int2 out;
+  out.x = x;
+  out.y = y;
+  return out;
+}
+
+inline static string __str__(int2 vec)
+{
+  string out = __add__(__add__(__add__(__add__(__add__("int2", "{"), to_str(vec.x)), ", "), to_str(vec.y)), "}");
+  return out;
+}
+
+typedef struct 
+{
+  int x;
+  int y;
+  int z;
+} int3;
+inline static int3 make_int3(int x, int y, int z)
+{
+  int3 out;
+  out.x = x;
+  out.y = y;
+  out.z = z;
+  return out;
+}
+
+inline static string __str__(int3 vec)
+{
+  string out = __add__(__add__(__add__(__add__(__add__(__add__(__add__("int3", "{"), to_str(vec.x)), ", "), to_str(vec.y)), ", "), to_str(vec.z)), "}");
+  return out;
+}
+
+typedef struct 
+{
+  int x;
+  int y;
+  int z;
+  int w;
+} int4;
+inline static int4 make_int4(int x, int y, int z, int w)
+{
+  int4 out;
+  out.x = x;
+  out.y = y;
+  out.z = z;
+  out.w = w;
+  return out;
+}
+
+inline static string __str__(int4 vec)
+{
+  string out = __add__(__add__(__add__(__add__(__add__(__add__(__add__(__add__(__add__("int4", "{"), to_str(vec.x)), ", "), to_str(vec.y)), ", "), to_str(vec.z)), ", "), to_str(vec.w)), "}");
+  return out;
+}
+
+typedef struct 
+{
+  long x;
+  long y;
+} long2;
+inline static long2 make_long2(long x, long y)
+{
+  long2 out;
+  out.x = x;
+  out.y = y;
+  return out;
+}
+
+inline static string __str__(long2 vec)
+{
+  string out = __add__(__add__(__add__(__add__(__add__("long2", "{"), to_str(vec.x)), ", "), to_str(vec.y)), "}");
+  return out;
+}
+
+typedef struct 
+{
+  long x;
+  long y;
+  long z;
+} long3;
+inline static long3 make_long3(long x, long y, long z)
+{
+  long3 out;
+  out.x = x;
+  out.y = y;
+  out.z = z;
+  return out;
+}
+
+inline static string __str__(long3 vec)
+{
+  string out = __add__(__add__(__add__(__add__(__add__(__add__(__add__("long3", "{"), to_str(vec.x)), ", "), to_str(vec.y)), ", "), to_str(vec.z)), "}");
+  return out;
+}
+
+typedef struct 
+{
+  long x;
+  long y;
+  long z;
+  long w;
+} long4;
+inline static long4 make_long4(long x, long y, long z, long w)
+{
+  long4 out;
+  out.x = x;
+  out.y = y;
+  out.z = z;
+  out.w = w;
+  return out;
+}
+
+inline static string __str__(long4 vec)
+{
+  string out = __add__(__add__(__add__(__add__(__add__(__add__(__add__(__add__(__add__("long4", "{"), to_str(vec.x)), ", "), to_str(vec.y)), ", "), to_str(vec.z)), ", "), to_str(vec.w)), "}");
+  return out;
+}
+
+struct list_struct__template__int
+{
+  int *raw;
+  int length;
+  int n_allocated;
+};
+typedef struct list_struct__template__int *list__template__int;
+inline static list__template__int make_list__template__int(void)
+{
+  list__template__int out = (list__template__int) GC_malloc(sizeof(struct list_struct__template__int));
+  if (!__neq__(out, nullptr))
+  {
+    printf("%s: FAILED\n", "out != NULL");
+    exit(1);
+  }
+  ;
+  out->length = 0;
+  out->n_allocated = 10;
+  out->raw = (int *) GC_malloc(__mul__(sizeof(int), 10));
+  if (!__neq__(out->raw, nullptr))
+  {
+    printf("%s: FAILED\n", "out->raw != NULL");
+    exit(1);
+  }
+  ;
+  return out;
+}
+
+inline static void append(list__template__int lst, int val)
+{
+  if (!__neq__(lst, nullptr))
+  {
+    printf("%s: FAILED\n", "lst != NULL");
+    exit(1);
+  }
+  ;
+  if (!__ge__(lst->length, 0))
+  {
+    printf("%s: FAILED\n", "lst->length >= 0");
+    exit(1);
+  }
+  ;
+  if (!__lt__(lst->length, lst->n_allocated))
+  {
+    lst->n_allocated = __add__(lst->n_allocated, 10);
+    lst->raw = (int *) GC_realloc(lst->raw, __mul__(sizeof(int), lst->n_allocated));
+    if (!__neq__(lst->raw, nullptr))
+    {
+      printf("%s: FAILED\n", "lst->raw != NULL");
+      exit(1);
+    }
+    ;
+  }
+  if (!__lt__(lst->length, lst->n_allocated))
+  {
+    printf("%s: FAILED\n", "lst->length < lst->n_allocated");
+    exit(1);
+  }
+  ;
+  __index_wrapper__(lst->raw, lst->length) = val;
+  lst->length++;
+  return;
+}
+
+inline static int pop(list__template__int lst)
+{
+  if (!__neq__(lst, nullptr))
+  {
+    printf("%s: FAILED\n", "lst != NULL");
+    exit(1);
+  }
+  ;
+  if (!__gt__(lst->length, 0))
+  {
+    printf("%s: FAILED\n", "lst->length > 0");
+    exit(1);
+  }
+  ;
+  lst->length--;
+  int out = __index_wrapper__(lst->raw, lst->length);
+  if (__gt__(__sub__(lst->n_allocated, lst->length), 10))
+  {
+    lst->n_allocated = __sub__(lst->n_allocated, 10);
+    if (!__gt__(lst->n_allocated, 0))
+    {
+      printf("%s: FAILED\n", "lst->n_allocated > 0");
+      exit(1);
+    }
+    ;
+    if (!__ge__(lst->n_allocated, lst->length))
+    {
+      printf("%s: FAILED\n", "lst->n_allocated >= lst->length");
+      exit(1);
+    }
+    ;
+    lst->raw = (int *) GC_realloc(lst->raw, __mul__(sizeof(int), lst->n_allocated));
+  }
+  return out;
+}
+
+inline static int len(list__template__int lst)
+{
+  if (!__neq__(lst, nullptr))
+  {
+    printf("%s: FAILED\n", "lst != NULL");
+    exit(1);
+  }
+  ;
+  return lst->length;
+}
+
+inline static int *__index__(list__template__int lst, int *idxs, int n)
+{
+  if (!__eq__(n, 1))
+  {
+    printf("%s: FAILED\n", "n == 1");
+    exit(1);
+  }
+  ;
+  int idx = __index_wrapper__(idxs, 0);
+  if (!__lt__(idx, lst->length))
+  {
+    printf("%s: FAILED\n", "idx < lst->length");
+    exit(1);
+  }
+  ;
+  return &__index_wrapper__(lst->raw, idx);
 }
 
 int main()
 {
+  auto my_list = make_list__template__int();
+  printf("len = %d\n", len(my_list));
+  append(my_list, 1);
+  println(__index_wrapper__(my_list, 0));
+  __index_wrapper__(my_list, 0) = 1;
+  println(__index_wrapper__(my_list, 0));
+  printf("len = %d\n", len(my_list));
+  printf("%d\n", pop(my_list));
+  printf("len = %d\n", len(my_list));
   return 0;
 }
 

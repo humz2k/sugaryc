@@ -41,13 +41,27 @@ def replace_T(code, replacement, T):
 
     return re.sub(pattern, replacer, code)
 
-def handle_templates(raw):
-    #print(raw)
-    out = re.search(r'\btemplate\b<\b.+\=(.*)>.?\{', raw)
-    if out is None:
-        return raw
-    template_str = out.string[out.span()[0]:out.span()[1]]
-    func = raw[out.span()[1]:]
+class GeneratedTemplate:
+    def __init__(self,gen_strs,code,Ts):
+        self.code = code
+        self.Ts = Ts
+        self.gen_strs = gen_strs
+        self.generated = []
+
+    def get_replacer(self):
+        return "__generate(" + "_".join(self.gen_strs) + "__" + "_".join(self.Ts) + ")\n"
+
+    def generate(self,code,reTs):
+        if (tuple(reTs) in self.generated):
+            return code
+        self.generated.append(tuple(reTs))
+        assert(len(reTs) == len(self.Ts))
+        out_str = self.code
+        for t,T in zip(reTs,self.Ts):
+            out_str = replace_T(out_str,t,T)
+        return code.replace(self.get_replacer(),out_str + "\n" + self.get_replacer())
+
+def capture_template(func):
     out_func = ""
     count = 0
     for i in func:
@@ -58,6 +72,16 @@ def handle_templates(raw):
         if count < 0:
             break
         out_func += i
+    return out_func
+
+def handle_templates(raw):
+    #print(raw)
+    out = re.search(r'\btemplate\s*<\b.+\=(.*)>.?\{', raw)
+    if out is None:
+        return raw
+    template_str = out.string[out.span()[0]:out.span()[1]]
+    func = raw[out.span()[1]:]
+    out_func = capture_template(func)
     template_args = "".join(("".join(template_str.split("<")[1:])).split(">")[:-1])
     template_T = template_args.split("=")[0].strip()
     types = [i.strip() for i in template_args.split("=")[1].split(",")]
@@ -68,34 +92,64 @@ def handle_templates(raw):
     raw = raw.replace(to_replace,out_str)
     return handle_templates(raw)
 
+generateds = {}
+
+def handle_generated(raw):
+    global generateds
+    #print(raw)
+    out = re.search(r'\bgenerated\b(.+)<(.*)>.?\{', raw)
+    gen_strs = [i.strip() for i in out.group(1).split(",")]
+    Ts = [i.strip() for i in out.group(2).split(",")]
+    func = raw[out.span()[1]:]
+    out_func = capture_template(func)
+    template_str = out.string[out.span()[0]:out.span()[1]]
+    to_replace = template_str + out_func + "}"
+    replace_with = ""
+    temp = GeneratedTemplate(gen_strs,out_func,Ts)
+    for gen_str in gen_strs:
+        generateds[gen_str] = temp
+    raw = raw.replace(to_replace,temp.get_replacer())
+    
+    return raw
 
 def replace_innermost_brackets(code):
     # Pattern to match the innermost angle brackets
     pattern = r'(\w+)<([^<>]+)>'
 
-    macros = []
+    if re.search(pattern,code) is None:
+        return code
 
+    to_gen = []
     # Function to replace angle brackets with parentheses
     def replacer(match):
         # Extract the string before the angle brackets
         string_before_brackets = match.group(1)
-
-        # Perform some operation on string_before_brackets (example: uppercase it)
-        macros.append(string_before_brackets)
-
+        gen_str = string_before_brackets.strip()
+        if (gen_str in generateds):
+            Ts = [i.strip() for i in match.group(2).split(",")]
+            to_gen.append((generateds[gen_str],Ts))
         # Replace angle brackets with parentheses and prepend the processed string
-        return string_before_brackets + '__template__' + "__".join([i.strip().replace(" ","_") for i in match.group(2).split(",")])
+        return string_before_brackets + '__template__' + "__".join([i.strip().replace(" ","_").replace("*","_ptr_") for i in match.group(2).split(",")])
 
     # Apply the regex replacement repeatedly until there are no more matches
     while re.search(pattern, code):
         code = re.sub(pattern, replacer, code)
-    print(macros)
-    return code
+    for i,j in to_gen:
+        code = i.generate(code,j)
+    return replace_innermost_brackets(code)
 
 def handle_struct_templates(raw):
-    #print(raw)
-    print(replace_innermost_brackets(raw))
-    exit()
+    return replace_innermost_brackets(raw)
+
+
+def handle_modules(raw):
+    out = re.search(r'\bmodule\s+(\w*);', raw)
+    if out is None:
+        return raw
+    out = out.group(1)
+    raw = re.sub(r'\bmodule\s+(\w*);','',raw)
+    pattern = r'\b' + out + r'\s*\.\s*'
+    raw = re.sub(pattern,out + "__",raw)
     return raw
 
 
@@ -110,15 +164,14 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
 
     with open(tmp_file,"r") as f:
         raw = f.read()
+    raw = handle_modules(raw)
     raw = handle_templates(raw)
+    raw = handle_generated(raw)
     raw = handle_struct_templates(raw)
-    print(raw)
-    exit()
+    raw = "#define __generate(...) \n #define bool _Bool \n #define true 1 \n #define false 0 \n" + raw
 
     with open(tmp_file,"w") as f:
         f.write(raw)
-
-    print(raw)
 
     #exit()
     
@@ -126,8 +179,10 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
     #    cpp_path='gcc-13',
     #    cpp_args=['-E',r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"include")] + includes + ['-xc'])
     
-    ast = parse_file(tmp_file, use_cpp=False)
-    exit()
+    ast = parse_file(tmp_file, use_cpp=True, cpp_path='gcc-13',cpp_args=['-E','-xc'])
+    
+    if not keep_temp:
+        os.remove(tmp_file)
     
     generator = c_generator.CGenerator()
 

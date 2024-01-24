@@ -1,6 +1,8 @@
 
 #include <type_traits>
 
+#include <stdbool.h>
+
 template <typename T, typename T2>
 static inline typename std::common_type<T, T2>::type __add__(T t, T2 t2) {
     return t + t2;
@@ -128,6 +130,7 @@ static inline int _n_var_args(T i, Args... args){
 }
 
 extern "C" void* GC_malloc(int);
+extern "C" void* GC_realloc(void*,int);
 
 template <typename T>
 static inline void _vaptr_helper(T* out, int n){
@@ -177,6 +180,8 @@ extern "C" void exit(int);
 
 #define __global__ 
 
+#define __generate(...) 
+
 #define warpsize 32
 
 #define LAUNCH_KERNEL(func,numBlocks,blockSize,...) \
@@ -190,6 +195,9 @@ extern "C" void exit(int);
         }\
     }\
 }
+
+ 
+#define __bool_true_false_are_defined 1
 
 //#ifndef NULL
 
