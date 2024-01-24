@@ -5,15 +5,25 @@
 //#include <lists.sgh>
 
 
-template<T = int, float>{ 
+template<T1 = int, float>{ 
 
-    struct my_struct<T>{
-        T a;
-        T b;
-    }
+    //template<T1 = int, float>{
+
+        struct template_1<T1>{
+            T1 a;
+        }
+
+        struct my_struct< T1 >{
+            T1 a;
+        }
+
+    //}
 
 }
 
 int main(){
+
+    struct my_struct<int> a;
+
     return 0;
 }

@@ -37,7 +37,7 @@ def replace_T(code, replacement, T):
 
     def replacer(match):
         # If the match is T, replace it; otherwise, return the match unchanged
-        return replacement if match.group(0) == 'T' else match.group(0)
+        return replacement if match.group(0) == T else match.group(0)
 
     return re.sub(pattern, replacer, code)
 
@@ -68,8 +68,34 @@ def handle_templates(raw):
     raw = raw.replace(to_replace,out_str)
     return handle_templates(raw)
 
+
+def replace_innermost_brackets(code):
+    # Pattern to match the innermost angle brackets
+    pattern = r'(\w+)<([^<>]+)>'
+
+    macros = []
+
+    # Function to replace angle brackets with parentheses
+    def replacer(match):
+        # Extract the string before the angle brackets
+        string_before_brackets = match.group(1)
+
+        # Perform some operation on string_before_brackets (example: uppercase it)
+        macros.append(string_before_brackets)
+
+        # Replace angle brackets with parentheses and prepend the processed string
+        return string_before_brackets + '__template__' + "_".join([i.strip() for i in match.group(2).split(",")])
+
+    # Apply the regex replacement repeatedly until there are no more matches
+    while re.search(pattern, code):
+        code = re.sub(pattern, replacer, code)
+    print(macros)
+    return code
+
 def handle_struct_templates(raw):
     #print(raw)
+    print(replace_innermost_brackets(raw))
+    exit()
     return raw
 
 
@@ -87,10 +113,12 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
     raw = handle_templates(raw)
     raw = handle_struct_templates(raw)
     print(raw)
-    #exit()
+    exit()
 
     with open(tmp_file,"w") as f:
         f.write(raw)
+
+    print(raw)
 
     #exit()
     
@@ -99,6 +127,7 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
     #    cpp_args=['-E',r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"include")] + includes + ['-xc'])
     
     ast = parse_file(tmp_file, use_cpp=False)
+    exit()
     
     generator = c_generator.CGenerator()
 

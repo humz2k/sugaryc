@@ -9,24 +9,25 @@
 
 
 
-
-
-    struct my_struct<int>{
-        int a;
-        int b;
-    }
+template<T1 = int, float>{
 
 
 
+        struct template_1<T1>{
+            T1 a;
+        }
 
-    struct my_struct<float>{
-        float a;
-        float b;
-    }
+        struct my_struct< T1 >{
+            T1 a;
+        }
 
 
 
+}
 
 int main(){
+
+    struct my_struct<int> a;
+
     return 0;
 }
