@@ -1,6 +1,6 @@
 # sugaryc
  
-C, but with function overloading, operator overloading, and uniform function call syntax (and a garbage collector).
+C, but with function overloading, operator overloading, modules, templates, and uniform function call syntax (and a garbage collector).
 
 ```
 struct my_struct{
