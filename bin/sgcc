@@ -142,7 +142,9 @@ def replace_innermost_brackets(code):
             "(": "lpar",
             ")": "rpar",
             "!": "not",
-            "~": "neg"
+            "~": "neg",
+            ":": "colon",
+            "?": "question"
         }
 
         tmp = [i.strip().replace(" ","") for i in match.group(2).split(",")]
