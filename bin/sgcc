@@ -216,11 +216,16 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
 
     with open(tmp_file,"r") as f:
         raw = f.read()
-    raw = handle_modules(raw)
-    raw = handle_templates(raw)
-    raw = handle_generated(raw)
-    raw = handle_struct_templates(raw)
-    raw = handle_foreach(raw)
+    before = raw
+    while True:
+        raw = handle_modules(raw)
+        raw = handle_templates(raw)
+        raw = handle_generated(raw)
+        raw = handle_struct_templates(raw)
+        raw = handle_foreach(raw)
+        if before == raw:
+            break
+        before = raw
     raw = "#define __generate(...) \n #define bool _Bool \n #define true 1 \n #define false 0 \n" + raw
 
     with open(tmp_file,"w") as f:

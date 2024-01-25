@@ -1,0 +1,12 @@
+generated op <T1,o,T2,_,T3>{
+    T3 op<T1,o,T2,=,T3> (T1 l, T2 r){
+        return l o r;
+    }
+}
+
+int main(){
+
+    float a = op<int,+,int,=,float>(1,2);
+
+    return 0;
+}
