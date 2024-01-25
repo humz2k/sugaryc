@@ -1,0 +1,44 @@
+#ifndef _FILTER_MAP_REDUCE_SGH_
+#define _FILTER_MAP_REDUCE_SGH_
+
+module std;
+
+generated std.filter<T,cond>{
+    static inline T std.filter<T,cond>(T lst){
+        T out = __init__<T>();
+        int length = len(lst);
+        for (int i = 0; i < length; i++){
+            auto val = lst[i];
+            if (cond){
+                out.__append__(val);
+            }
+        }
+        return out;
+    }
+}
+
+generated std.map<T,func>{
+    static inline T std.map<T,func>(T lst){
+        T out = __init__<T>();
+        int length = len(lst);
+        for (int i = 0; i < length; i++){
+            auto val = lst[i];
+            out.__append__(func);
+        }
+        return out;
+    }
+}
+
+generated std.reduce<Tin,func,Tout>{
+    static inline Tout std.reduce<Tin,func,Tout>(Tin lst, Tout initial){
+        Tout last = initial;
+        int length = len(lst);
+        for (int i = 0; i < length; i++){
+            auto val = lst[i];
+            last = func;
+        }
+        return last;
+    }
+}
+
+#endif

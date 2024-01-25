@@ -237,6 +237,7 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
         raw = f.read()
 
     before = raw
+    count = 0
     while True:
         raw = handle_modules(raw)
         raw = handle_templates(raw)

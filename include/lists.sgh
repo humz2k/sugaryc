@@ -4,6 +4,7 @@
 #include <stdlib.sgh>
 #include <assert.sgh>
 #include <string.sgh>
+#include <range.sgh>
 
 module std;
 
@@ -30,6 +31,10 @@ generated std.list, std.make_list <T>{
         return out;
     }
 
+    static inline std.list<T> __init__<std.list<T>>(void){
+        return std.make_list<T>();
+    }
+
     static inline void append(std.list<T> lst, T val){
         assert(lst != NULL);
         assert(lst->length >= 0);
@@ -42,6 +47,10 @@ generated std.list, std.make_list <T>{
         lst->raw[lst->length] = val;
         lst->length++;
         return;
+    }
+    
+    static inline void __append__(std.list<T> lst, T val){
+        append(lst,val);
     }
 
     static inline T pop(std.list<T> lst, int idx){
@@ -136,6 +145,14 @@ generated std.list, std.make_list <T>{
         GC_free(lst);
     }
 
+}
+
+static inline std.list<int> to_list(range_obj obj){
+    std.list<int> out = std.make_list<int>();
+    foreach (auto i in obj){
+        out.append(i);
+    }
+    return out;
 }
 
 #endif

@@ -52,6 +52,14 @@ generated std.vector, std.make_vector <T> {
         return;
     }
 
+    static inline void __append__(std.vector<T> lst, T val){
+        push_back(lst,val);
+    }
+
+    static inline std.vector<T> __init__<std.vector<T>>(void){
+        return std.make_vector<T>();
+    }
+
     static inline void emplace_back(std.vector<T> vec){
         vec->length--;
         int allocated = vec->allocated/2;

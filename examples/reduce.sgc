@@ -1,0 +1,13 @@
+#include <stdlib.sgh>
+#include <lists.sgh>
+#include <filter_map_reduce.sgh>
+
+//a really inefficient way to sum [0,n]
+int sum_n(int n){
+    return std.reduce<std.list<int>,val+last,int>(range(n+1).to_list(),0);
+}
+
+int main(){
+    println(sum_n(100));
+    return 0;
+}
