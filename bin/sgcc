@@ -226,7 +226,7 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
         if before == raw:
             break
         before = raw
-    raw = "#define __generate(...) \n #define bool _Bool \n #define true 1 \n #define false 0 \n" + raw
+    raw = "#define __generate(...) \n #define bool _Bool \n #define true ((_Bool)1) \n #define false ((_Bool)0) \n" + raw
 
     with open(tmp_file,"w") as f:
         f.write(raw)

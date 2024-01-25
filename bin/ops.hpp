@@ -154,6 +154,11 @@ static inline T* _var_args_to_ptr(T i, Args... args){
 //#define __index_wrapper__(var,...) (*__index__(var,(int[]){__VA_ARGS__},_n_var_args(__VA_ARGS__)))
 #define __index_wrapper__(var,...) (*__index__(var,_var_args_to_ptr(__VA_ARGS__),_n_var_args(__VA_ARGS__)))
 
+static inline const char* __str__(_Bool i){
+    if (i == false)return "false";
+    return "true";
+}
+
 template <typename T>
 static inline const char* __str__(T a){
     return "NULL";
