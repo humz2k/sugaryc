@@ -12,7 +12,7 @@ __version__ = '2.21'
 
 import io
 from subprocess import check_output
-from .c_parser import CParser
+from .c_parser import CParser, ParseError
 
 
 def preprocess_file(filename, cpp_path='cpp', cpp_args=''):

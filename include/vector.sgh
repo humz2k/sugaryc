@@ -1,0 +1,120 @@
+#ifndef _VECTOR_SGH_
+#define _VECTOR_SGH_
+
+#include <stdlib.sgh>
+#include <assert.sgh>
+#include <string.sgh>
+
+#define INITIAL_VEC_LEN 4
+
+module std;
+
+generated std.vector, std.make_vector <T> {
+
+    struct std.vector_struct<T> {
+        T* raw;
+        int length;
+        int allocated;
+    };
+
+    typedef struct std.vector_struct<T>* std.vector<T>;
+
+    static inline int len(std.vector<T> vec){
+        return vec->length;
+    }
+
+    static inline std.vector<T> std.make_vector<T>(void){
+        std.vector<T> out = (std.vector<T>)GC_malloc(sizeof(struct std.vector_struct<T>));
+        out->raw = (T*)GC_malloc(sizeof(T) * INITIAL_VEC_LEN);
+        out->length = 0;
+        out->allocated = INITIAL_VEC_LEN;
+        return out;
+    }
+
+    static inline void double_capacity(std.vector<T> vec){
+        int allocated = vec->allocated;
+        int new_allocated = allocated*2;
+        vec->raw = (T*)GC_realloc(vec->raw, sizeof(T) * new_allocated);
+        vec->allocated = new_allocated;
+    }
+
+    static inline T* __index__(std.vector<T> vec, int* idxs, int n){
+        int idx = idxs[0];
+        return vec->raw + idx;
+    }
+
+    static inline void push_back(std.vector<T> vec, T val){
+        if (vec->length >= vec->allocated){
+            double_capacity(vec);
+        }
+        vec->raw[vec->length] = val;
+        vec->length++;
+        return;
+    }
+
+    static inline void emplace_back(std.vector<T> vec){
+        vec->length--;
+        int allocated = vec->allocated/2;
+        if (allocated > vec->length){
+            vec->raw = (T*)GC_realloc(vec->raw, sizeof(T) * allocated);
+            vec->allocated = allocated;
+        }
+    }
+
+    static inline T pop_back(std.vector<T> vec){
+        T out = vec->raw[vec->length-1];
+        emplace_back(vec);
+        return out;
+    }
+
+    static inline void reserve(std.vector<T> vec, int length){
+        int allocated = vec->allocated;
+        while (length > allocated){
+            allocated *= 2;
+        }
+        vec->raw = (T*)GC_realloc(vec->raw, sizeof(T) * allocated);
+        vec->allocated = allocated;
+    }
+
+    static inline void shrink_to_fit(std.vector<T> vec){
+        int allocated = vec->allocated;
+        int length = vec->length;
+        while (length < allocated){
+            allocated /= 2;
+        }
+        allocated *= 2;
+        vec->raw = (T*)GC_realloc(vec->raw, sizeof(T) * allocated);
+        vec->allocated = allocated;
+    }
+
+    static inline void resize(std.vector<T> vec, int length){
+        int allocated = INITIAL_VEC_LEN;
+        while (length > allocated){
+            allocated *= 2;
+        }
+        vec->raw = (T*)GC_realloc(vec->raw, sizeof(T) * allocated);
+        vec->allocated = allocated;
+        vec->length = length;
+    }
+
+    static inline string __str__(std.vector<T> vec){
+        string out = "[";
+        int length = vec->length;
+        for (int i = 0; i < (length-1); i++){
+            out += to_str(vec[i]) + ", ";
+        }
+        if (length > 0){
+            out += to_str(vec[length-1]);
+        }
+        out += "]";
+        return out;
+    }
+
+    static inline void destroy(std.vector<T> vec){
+        GC_free(vec->raw);
+        GC_free(vec);
+    }
+
+}
+
+#endif

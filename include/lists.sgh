@@ -131,6 +131,11 @@ generated std.list, std.make_list <T>{
         return lst->raw[lst->cur];
     }
 
+    static inline void destroy(std.list<T> lst){
+        GC_free(lst->raw);
+        GC_free(lst);
+    }
+
 }
 
 #endif

@@ -1,0 +1,141 @@
+#include <stdlib.sgh>
+#include <string.sgh>
+#include <assert.sgh>
+
+module std;
+
+template <T = int,float>{
+
+    typedef struct{
+        T* raw;
+        int length;
+    } std.array<T>;
+
+    std.array<T> std.make_array<T>(int sz){
+        std.array<T> out;
+        out.raw = (T*)GC_malloc(sizeof(T) * sz);
+        out.length = sz;
+        return out;
+    }
+
+    T* __index__(std.array<T> arr, int* indxs, int n){
+        int idx = *indxs;
+        return arr.raw+idx;
+    }
+
+    static inline string __str__(std.array<T> lst){
+        string out = "[";
+        for (int i = 0; i < lst.length-1; i++){
+            out += to_str(lst.raw[i]) + ", ";
+        }
+        if (lst.length > 0){
+            out += to_str(lst.raw[lst.length-1]);
+        }
+        out += "]";
+        return out;
+    }
+
+    static inline int len(std.array<T> arr){
+        return arr.length;
+    }
+
+    template <op = +,-,*,/>{
+
+        static inline std.array<T> array_broadcast<T,op>(std.array<T> l, std.array<T> r){
+            assert(len(l) == len(r));
+            std.array<T> out = std.make_array<T>(len(l));
+            T* out_raw = out.raw;
+            T* l_raw = l.raw;
+            T* r_raw = r.raw;
+            for (int i = 0; i < len(l); i++){
+                *out_raw++ = (*l_raw++) op (*r_raw++);
+            }
+            return out;
+        }
+
+        static inline std.array<T> array_broadcast<T,op>(std.array<T> l, T r){
+            std.array<T> out = std.make_array<T>(len(l));
+            T* out_raw = out.raw;
+            T* l_raw = l.raw;
+            for (int i = 0; i < len(l); i++){
+                *out_raw++ = (*l_raw++) op r;
+            }
+            return out;
+        }
+
+        static inline std.array<T> array_broadcast<T,op>(T l, std.array<T> r){
+            std.array<T> out = std.make_array<T>(len(r));
+            T* out_raw = out.raw;
+            T* r_raw = r.raw;
+            for (int i = 0; i < len(r); i++){
+                *out_raw++ = l op (*r_raw++);
+            }
+            return out;
+        }
+
+    }
+
+    static inline std.array<T> __add__(std.array<T> l, std.array<T> r){
+        return array_broadcast<T,+>(l,r);
+    }
+
+    static inline std.array<T> __add__(std.array<T> l, T r){
+        return array_broadcast<T,+>(l,r);
+    }
+
+    static inline std.array<T> __add__(T l, std.array<T> r){
+        return array_broadcast<T,+>(l,r);
+    }
+
+    static inline std.array<T> __mul__(std.array<T> l, std.array<T> r){
+        return array_broadcast<T,*>(l,r);
+    }
+
+    static inline std.array<T> __mul__(std.array<T> l, T r){
+        return array_broadcast<T,*>(l,r);
+    }
+
+    static inline std.array<T> __mul__(T l, std.array<T> r){
+        return array_broadcast<T,*>(l,r);
+    }
+
+    static inline std.array<T> __sub__(std.array<T> l, std.array<T> r){
+        return array_broadcast<T,->(l,r);
+    }
+
+    static inline std.array<T> __sub__(std.array<T> l, T r){
+        return array_broadcast<T,->(l,r);
+    }
+
+    static inline std.array<T> __sub__(T l, std.array<T> r){
+        return array_broadcast<T,->(l,r);
+    }
+
+    static inline std.array<T> __div__(std.array<T> l, std.array<T> r){
+        return array_broadcast<T,/>(l,r);
+    }
+
+    static inline std.array<T> __div__(std.array<T> l, T r){
+        return array_broadcast<T,/>(l,r);
+    }
+
+    static inline std.array<T> __div__(T l, std.array<T> r){
+        return array_broadcast<T,/>(l,r);
+    }
+
+}
+
+
+
+int main(){
+
+    println(true);
+
+    auto arr = std.make_array<int>(10) + 1;
+    auto arr2 = arr + 2;
+    arr2[0] = 0;
+    arr2[5] = 6;
+    println(arr2,arr,arr+arr2,len(arr));
+
+    return 0;
+}

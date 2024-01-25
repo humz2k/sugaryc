@@ -1,0 +1,106 @@
+#include <stdlib.sgh>
+#include <vector.sgh>
+#include <time.sgh>
+#include <lists.sgh>
+
+double malloc_many(int n){
+
+    auto start = CPUTimer();
+
+    int* arr = (int*)malloc(sizeof(int) * n);
+    int* iter = arr;
+    for (int i = 0; i < n; i++){
+        *iter++ = i;
+    }
+
+    auto end = CPUTimer(start);
+
+    free(arr);
+
+    return end;
+}
+
+double push_back_many(int n){
+    std.vector<int> my_vec = std.make_vector<int>();
+
+    auto start = CPUTimer();
+
+    for (int i = 0; i < n; i++){
+        my_vec.push_back(i);
+    }
+
+    auto end = CPUTimer(start);
+
+    my_vec.destroy();
+
+    return end;
+
+}
+
+double append_many(int n){
+    std.list<int> my_list = std.make_list<int>();
+    
+    auto start = CPUTimer();
+
+    for (int i = 0; i < n; i++){
+        my_list.append(i);
+    }
+
+    auto end = CPUTimer(start);
+
+    my_list.destroy();
+
+    return end;
+}
+
+double push_back_many_reserve(int n){
+    std.vector<int> my_vec = std.make_vector<int>();
+
+    auto start = CPUTimer();
+
+    my_vec.reserve(n);
+
+    for (int i = 0; i < n; i++){
+        my_vec.push_back(i);
+    }
+
+    auto end = CPUTimer(start);
+
+    my_vec.destroy();
+
+    return end;
+}
+
+int main(){
+    for (int n = 10; n < 100; n += 1){
+        push_back_many_reserve(n);
+        push_back_many(n);
+        append_many(n);
+        malloc_many(n);
+
+        int avg_of = 10;
+
+        double push_back_many_reserve_time = 0;
+        double push_back_many_time = 0;
+        double append_many_time = 0;
+        double malloc_many_time = 0;
+
+        for (int i = 0; i < avg_of; i++){
+            push_back_many_reserve_time += push_back_many_reserve(n);
+            push_back_many_time += push_back_many(n);
+            append_many_time += append_many(n);
+            malloc_many_time += malloc_many(n);
+        }
+        push_back_many_reserve_time /= (double)avg_of;
+        push_back_many_time /= (double)avg_of;
+        append_many_time /= (double)avg_of;
+        malloc_many_time /= (double)avg_of;
+        println("n =",n);
+        println("   push_back_many:",push_back_many_time);
+        println("   push_back_many_reserve:",push_back_many_reserve_time);
+        println("   append_many:",append_many_time);
+        println("   malloc_many:",malloc_many_time);
+    }
+
+    return 0;
+}

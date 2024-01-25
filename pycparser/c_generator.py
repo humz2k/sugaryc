@@ -27,10 +27,21 @@ class CGenerator(object):
 
     def _make_indent(self):
         return ' ' * self.indent_level
-
+    
+    def get_line_directive(self,coord):
+        if coord is None:
+            return ""
+        col = ""
+        if not (coord.column is None):
+            col = " " + str(coord.column)
+        return "\n#line " + str(coord.line) + ' "' + str(coord.file) + '"' + '\n'
+    
     def visit(self, node):
         method = 'visit_' + node.__class__.__name__
-        return getattr(self, method, self.generic_visit)(node)
+        line_directive = ""
+        if not node is None:
+            line_directive = self.get_line_directive(node.coord)
+        return line_directive + getattr(self, method, self.generic_visit)(node)
 
     def generic_visit(self, node):
         if node is None:

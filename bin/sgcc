@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
+import json
 import sys
 import os
 sys.path = [os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))] + sys.path
-from pycparser import c_generator, parse_file, c_ast
+from pycparser import c_generator, parse_file, c_ast, ParseError
 import argparse
 import re
 
@@ -205,6 +206,24 @@ def replace_foreach(code):
 def handle_foreach(raw):
     return replace_foreach(raw)
 
+def format_location(location):
+    return "\033[1m" + location['file'] + ":" + str(location['line']) + ":" + str(location['column']) + "\033[0m"
+
+def print_error(error):
+    kind = error['kind']
+    if kind == 'error':
+        error_msg = "\033[1;31m" + kind + ":\033[0;0m "
+    else:
+        error_msg = kind
+    message = error['message']
+    pattern = r"'.*'"
+    done = False
+    for match in re.findall(pattern,message):
+        message = message.replace(match,"'\033[1m" + match[1:-1] + "\033[0m'")
+    error_msg += message
+    error_msg = format_location(error["locations"][0]['caret']) + ": " + error_msg
+    print(error_msg)
+
 def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, echo = False, openmp = True):
 
     tmp_file = inp + "__tmp1_sgcc.tmp"
@@ -216,6 +235,7 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
 
     with open(tmp_file,"r") as f:
         raw = f.read()
+
     before = raw
     while True:
         raw = handle_modules(raw)
@@ -236,11 +256,17 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
     #ast = parse_file(inp, use_cpp=True,
     #    cpp_path='gcc-13',
     #    cpp_args=['-E',r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"include")] + includes + ['-xc'])
-    
-    ast = parse_file(tmp_file, use_cpp=True, cpp_path='gcc-13',cpp_args=['-E','-xc'])
+    try:
+        ast = parse_file(tmp_file, use_cpp=True, cpp_path='gcc-13',cpp_args=['-E','-xc'])
+    except ParseError as e:
+        print("\033[1;31m SYNTAX ERROR\033[0m:",e)
+        exit()
     
     if not keep_temp:
-        os.remove(tmp_file)
+        try:
+            os.remove(tmp_file)
+        except:
+            pass
     
     generator = c_generator.CGenerator()
 
@@ -264,17 +290,36 @@ static inline const char* to_str(T in){
     with open(temp_file,"w") as f:
         f.write(out)
 
-    command = cxx + " -O" + str(O) + " " + " -c " + temp_file + " -o " + outfile + " -Wno-c++11-extensions"
+    error_file = "__sgc_errors.json"
+
+    command = cxx + " -O" + str(O) + " " + " -c " + temp_file + " -o " + outfile + " -Wno-c++11-extensions -fdiagnostics-format=json"
     if (openmp):
         command += " -fopenmp"
+    command += " > /dev/null 2> " + error_file
 
     if (echo):
         print(command)
 
     os.system(command)
 
+    with open(error_file,"r") as f:
+        errors = f.read()
+    os.remove(error_file)
+
+    errors = json.loads(errors)
+    for i in errors:
+        print_error(i)
+    #print(errors)
+    #print(json.loads(errors))
+    #print(type(errors))
+
     if (not keep_temp):
-        os.remove(temp_file)
+        try:
+            os.remove(temp_file)
+        except:
+            pass
+    
+    return len(errors)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Compile .sgc")
@@ -319,7 +364,8 @@ if __name__ == "__main__":
         intermediate_outputs = [i.split(".")[0] + "__tmp.o" for i in to_compile]
         
         for i,j in zip(to_compile,intermediate_outputs):
-            compile_file(i,j,includes,O = args.O,cxx = args.cxx,keep_temp = args.save_temps, echo = args.echo, openmp = not args.no_parallel)
+            if compile_file(i,j,includes,O = args.O,cxx = args.cxx,keep_temp = args.save_temps, echo = args.echo, openmp = not args.no_parallel) != 0:
+                exit()
 
         link_command = args.cxx + " -o " + args.o + " -O" + str(args.O) + " " + " ".join(intermediate_outputs + to_link) + " " + " ".join(includes + link_dir + links)
 
@@ -332,5 +378,8 @@ if __name__ == "__main__":
         os.system(link_command)
 
         for i in intermediate_outputs:
-            os.remove(i)
+            try:
+                os.remove(i)
+            except:
+                pass
     

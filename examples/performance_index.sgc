@@ -1,0 +1,73 @@
+#include <stdlib.sgh>
+#include <string.sgh>
+#include <time.sgh>
+
+double ptr_only(int n, int* out){
+
+    int* arr = (int*)malloc(sizeof(int) * n);
+
+    auto start = CPUTimer();
+
+    int* iter = arr;
+    for (int i = 0; i < n; i++){
+        *iter++ = i;
+    }
+
+    int sum = 0;
+    iter = arr;
+    for (int i = 0; i < n; i++){
+        sum += *iter++;
+    }
+
+    auto end = CPUTimer(start);
+
+    *out = sum;
+
+    free(arr);
+
+    return end;
+
+}
+
+double index_only(int n, int* out){
+    int* arr = (int*)malloc(sizeof(int) * n);
+
+    auto start = CPUTimer();
+
+    for (int i = 0; i < n; i++){
+        arr[i] = i;
+    }
+
+    int sum = 0;
+    for (int i = 0; i < n; i++){
+        sum += arr[i];
+    }
+
+    auto end = CPUTimer(start);
+
+    *out = sum;
+
+    free(arr);
+
+    return end;
+}
+
+int main(){
+    int sum;
+    int n = 1000000;
+
+    ptr_only(n,&sum);
+    index_only(n,&sum);
+    int tries = 5;
+    double diff = 0;
+    for (int i = 0; i < tries; i++){
+        double a = ptr_only(n,&sum);
+        double b = index_only(n,&sum);
+        diff += b - a;
+    }
+
+    println("raw diff:",diff);
+    println("avg:",diff/((double)(n*tries)));
+
+    return 0;
+}
