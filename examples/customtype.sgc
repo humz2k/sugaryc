@@ -5,7 +5,7 @@ struct my_struct{
     int a;
 };
 
-#include <safe_ptr.sgh>
+#include <safe_ptr.sgh> //needs to know about relevant types
 
 typedef std.safe_ptr<struct my_struct> my_object;
 
