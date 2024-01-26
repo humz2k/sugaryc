@@ -7,7 +7,7 @@ Sugaryc is (almost) a strict superset of C, with extra features that try to make
 ## Getting Started
 
 ### Building
-Run `chmod +x build.sh; ./build.sh` to build the standard library, header files and pycparser scripts, OR run `make clean; make all` in `cstdlib`, `make clean; make libsgc.a` in `stdlib` and `python3 _build_tables.py` in `pycparser`.
+Run `chmod +x build.sh; ./build.sh` to build the gc, standard library, header files and pycparser scripts.
 
 ### Using the compiler
 
