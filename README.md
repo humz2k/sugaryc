@@ -2,6 +2,9 @@
  
 C, but with function overloading, operator overloading, modules, templates, and uniform function call syntax (and a garbage collector).
 
+## Building
+Run `chmod +x build.sh; ./build.sh`
+
 Add `bin` to path, then compile with `sgcc`. For example, `sgcc my_file.sgc -o a.out`.
 
 `usage: sgcc [-h] [-o <output>] [-cxx <cxx>] [-c] [-O <opt>] [--echo] [-I <I> [<I> ...]] [-L <L> [<L> ...]] [-l <l> [<l> ...]] [--no-parallel] [--save-temps] <source> [<source> ...]`
