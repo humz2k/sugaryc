@@ -22,6 +22,7 @@ $(BUILD_DIR)/%.o: $(SOURCEDIR)/%.cpp | $(BUILD_DIR)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/nptools
 
 .PHONY: clean
 

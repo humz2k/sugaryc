@@ -1,0 +1,243 @@
+#include <stdlib.sgh>
+#include <string.sgh>
+#include <assert.sgh>
+#include <nptools/nparray.sgh>
+
+shape_t make_shape_t(int* dims, int n){
+    shape_t out;
+    out.raw = dims;
+    out.n = n;
+    return out;
+}
+
+const int* __index__(shape_t dims, int* idxs, int nidx){
+    return dims.raw + *idxs;
+}
+
+int len(shape_t dims){
+    return dims.n;
+}
+
+void destroy(shape_t dims){
+    GC_free(dims.raw);
+}
+
+int count(shape_t dims){
+    int out = 1;
+    for (int i = 0; i < dims.n; i++){
+        out *= dims[i];
+    }
+    return out;
+}
+
+shape_t copy(shape_t dims){
+    shape_t out;
+    out.raw = (int*)GC_malloc(sizeof(int) * dims.n);
+    out.n = dims.n;
+    for (int i = 0; i < out.n; i++){
+        out.raw[i] = dims.raw[i];
+    }
+    return out;
+}
+
+string __str__(shape_t dims){
+    string out = "(";
+    for (int i = 0; i < (dims.n - 1); i++){
+        out += to_str(dims[i]) + ", ";
+    }
+    if (dims.n > 0){
+        out += to_str(dims[dims.n - 1]);
+    }
+    return out + ")";
+}
+
+static inline void idx1d2nd(int idx, shape_t dims, int* out){
+    for (int i = len(dims)-1; i >= 0; i--){
+        out[i] = idx%dims[i];
+        idx /= dims[i];
+    }
+}
+
+module np;
+
+template <T=types>{
+
+    np.ndarray<T> np.array<T>(shape_t dims){
+
+        np.ndarray<T> out;
+        out.shape = dims;
+        out.size = dims.count();
+        out.raw = (T*)GC_malloc(sizeof(T) * out.size);
+        return out;
+
+    }
+
+    np.ndarray<T> np.ones<T>(shape_t dims){
+        np.ndarray<T> out = np.array<T>(dims);
+        for (int i = 0; i < out.size; i++){
+            out.raw[i] = 1;
+        }
+        return out;
+    }
+
+    np.ndarray<T> np.zeros<T>(shape_t dims){
+        np.ndarray<T> out = np.array<T>(dims);
+        for (int i = 0; i < out.size; i++){
+            out.raw[i] = 0;
+        }
+        return out;
+    }
+
+    T* __index__(np.ndarray<T> arr, int* idxs, int nidx){
+        int ndims = len(arr.shape);
+        assert(nidx == ndims);
+        int idx1d = idxs[0];
+        for (int i = 1; i < ndims; i++){
+            idx1d *= arr.shape[i];
+            idx1d += idxs[i];
+        }
+        return arr.raw + idx1d;
+    }
+
+    void destroy(np.ndarray<T> arr){
+        arr.shape.destroy();
+        GC_free(arr.raw);
+    }
+
+    np.ndarray<T> reshape(np.ndarray<T> arr, shape_t new_dims){
+        np.ndarray<T> out;
+        out.raw = arr.raw;
+        out.size = arr.size;
+        assert(new_dims.count() == arr.shape.count());
+        out.shape = new_dims;
+        return out;
+    }
+
+    np.ndarray<T> copy(np.ndarray<T> arr){
+        np.ndarray<T> out;
+        out.raw = (T*)GC_malloc(sizeof(T)*arr.size);
+        out.size = arr.size;
+        out.shape = arr.shape.copy();
+        for (int i = 0; i < out.size; i++){
+            out.raw[i] = arr.raw[i];
+        }
+        return out;
+    }
+
+    np.ndarray<T> flatten(np.ndarray<T> arr){
+        return arr.reshape(Shape(arr.size));
+    }
+
+    //this is terrible
+    string __str__(np.ndarray<T> arr){
+        int ndims = len(arr.shape);
+        string out = "[" * ndims;
+        int idxs[ndims];
+        int lasts[ndims];
+        for (int i = 0; i < ndims; i++){
+            lasts[i] = 0;
+        }
+        out += to_str(arr.raw[0]);
+        for (int i = 1; i < arr.size; i++){
+            idx1d2nd(i,arr.shape,idxs);
+
+            if (idxs[ndims-1] == 0){
+                out += "]";
+            }
+
+            for (int j = ndims-2; j >= 0; j--){
+                if ((idxs[j] == 0) && (lasts[j] != idxs[j])){
+                    out += "]";
+                }
+            }
+
+            if (ndims-2 >= 0){
+                if (idxs[ndims-2] != lasts[ndims-2]){
+                    out += "\n";
+                }
+            }
+            int extra_count = 0;
+
+            if (ndims-2 >= 0){
+                for (int j = ndims-2; j >= 0; j--){
+                    if (!((idxs[j] == 0) && (lasts[j] != idxs[j]))){
+                        if (idxs[ndims-2] != lasts[ndims-2]){
+                            extra_count++;
+                        }
+                    }
+                }
+            }
+
+            out += " " * extra_count;
+
+            for (int j = ndims-2; j >= 0; j--){
+                if ((idxs[j] == 0) && (lasts[j] != idxs[j])){
+                    out += "[";
+                }
+            }
+
+            if (idxs[ndims-1] == 0){
+                out += "[";
+            } else{
+                out += " ";
+            }
+
+            for (int j = 0; j < ndims; j++){
+                lasts[j] = idxs[j];
+            }
+
+            out += to_str(arr.raw[i]);
+            
+        }
+
+        return out + "]" * ndims;
+    }
+
+}
+
+template<T1 = types>{
+
+    template<T2 = types>{
+
+        np.ndarray<T2> as_type<T2>(np.ndarray<T1> arr){
+            np.ndarray<T2> out = np.array<T2>(arr.shape);
+            for (int i = 0; i < arr.size; i++){
+                out.raw[i] = arr.raw[i];
+            }
+            return out;
+        }
+
+    }
+
+}
+
+template<T = float_types>{
+
+    np.ndarray<T> np.linspace<T>(T start, T stop, int n){
+        np.ndarray<T> out = np.array<T>(Shape(n));
+        T step = (stop - start)/(T)(n-1);
+        T cur = start;
+        for (int i = 0; i < n; i++){
+            out.raw[i] = cur;
+            cur += step;
+        }
+        return out;
+    }
+
+}
+
+np.ndarray<float> np.linspace(float start, float stop, int n){
+    return np.linspace<float>(start,stop,n);
+}
+
+np.ndarray<float> np.ones(shape_t dims){
+    return np.ones<float>(dims);
+}
+
+np.ndarray<float> np.array(shape_t dims){
+    return np.array<float>(dims);
+}
+
+np.ndarray<float> np.zeros(shape_t dims){
+    return np.zeros<float>(dims);
+}

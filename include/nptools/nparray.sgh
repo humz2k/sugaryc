@@ -1,0 +1,92 @@
+#ifndef _NPARRAY_SGH_
+#define _NPARRAY_SGH_
+
+#include <stdlib.sgh>
+#include <string.sgh>
+#include <assert.sgh>
+
+#define float_types float,double
+#define int_types short,int,long,long long,unsigned short,unsigned int,unsigned long,unsigned long long
+
+#define types float_types,int_types
+
+#define Shape(...) make_shape_t(_var_args_to_ptr(__VA_ARGS__),_n_var_args(__VA_ARGS__))
+
+typedef struct {
+    int* raw;
+    int n;
+} shape_t;
+
+shape_t make_shape_t(int* dims, int n);
+
+const int* __index__(shape_t dims, int* idxs, int nidx);
+
+int len(shape_t dims);
+
+void destroy(shape_t dims);
+
+int count(shape_t dims);
+
+shape_t copy(shape_t dims);
+
+string __str__(shape_t dims);
+
+module np;
+
+template <T=types>{
+
+    typedef struct{
+        T* raw;
+        shape_t shape;
+        int size;
+    } np.ndarray<T>;
+
+}
+
+template <T=types>{
+
+    np.ndarray<T> np.array<T>(shape_t dims);
+
+    np.ndarray<T> np.ones<T>(shape_t dims);
+
+    np.ndarray<T> np.zeros<T>(shape_t dims);
+
+    T* __index__(np.ndarray<T> arr, int* idxs, int nidx);
+
+    void destroy(np.ndarray<T> arr);
+
+    np.ndarray<T> reshape(np.ndarray<T> arr, shape_t new_dims);
+
+    np.ndarray<T> copy(np.ndarray<T> arr);
+
+    np.ndarray<T> flatten(np.ndarray<T> arr);
+
+    string __str__(np.ndarray<T> arr);
+
+}
+
+template<T1 = types>{
+
+    template<T2 = types>{
+
+        np.ndarray<T2> as_type<T2>(np.ndarray<T1> arr);
+
+    }
+
+}
+
+template<T = float_types>{
+
+    np.ndarray<T> np.linspace<T>(T start, T stop, int n);
+
+}
+
+np.ndarray<float> np.linspace(float start, float stop, int n);
+
+np.ndarray<float> np.ones(shape_t dims);
+
+np.ndarray<float> np.array(shape_t dims);
+
+np.ndarray<float> np.zeros(shape_t dims);
+
+#endif
