@@ -230,7 +230,7 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
 
     tmp_file = inp + "__tmp1_sgcc.tmp"
     cpp_args = ['-E',r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"include")] + includes + ['-xc',inp,'-o',tmp_file]
-    cpp_call = "gcc-13 " + " ".join(cpp_args)
+    cpp_call = cxx + " " + " ".join(cpp_args)
     if echo:
         print(cpp_call)
     os.system(cpp_call)
@@ -260,7 +260,7 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
     #    cpp_path='gcc-13',
     #    cpp_args=['-E',r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"include")] + includes + ['-xc'])
     try:
-        ast = parse_file(tmp_file, use_cpp=True, cpp_path='gcc-13',cpp_args=['-E','-xc'])
+        ast = parse_file(tmp_file, use_cpp=True, cpp_path=cxx,cpp_args=['-E','-xc'])
     except ParseError as e:
         print("\033[1;31m SYNTAX ERROR\033[0m:",e)
         exit()
