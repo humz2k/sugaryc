@@ -25,7 +25,7 @@ Or, I can call it like this:
 obj.my_method(1);
 ```
 
-This means I can add \`methods\` whereever I want to, and I can even add \`methods\` to built in types:
+This means I can add \`methods\` wherever I want, and I can even add \`methods\` to built in types:
 ```
 int add_1(int x){
     return x+1;
