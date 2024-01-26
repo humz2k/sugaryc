@@ -1818,12 +1818,16 @@ class CParser(PLYParser):
 
     def p_postfix_expression_2(self, p):
         """ postfix_expression  : postfix_expression LBRACKET argument_expression_list RBRACKET """
-        func_name = c_ast.ID("__index_wrapper__", self._token_coord(p, 2))
+        
         try:
             expr_list = p[3]
             expr_list.exprs = [p[1]] + expr_list.exprs
         except:
             expr_list = c_ast.ExprList([p[1],p[3]],p[3].coord)
+        if (len(expr_list.exprs) > 5):
+            func_name = c_ast.ID("__index_wrapper__", self._token_coord(p, 2))
+        else:
+            func_name = c_ast.ID("__index_wrapper_simple__", self._token_coord(p, 2))
         #p[0] = c_ast.FuncCall(func_name, c_ast.ExprList([p[1],p[3]], p[1].coord), p[1].coord)
         p[0] = c_ast.FuncCall(func_name, expr_list, p[1].coord)
         p[0].sugared = True

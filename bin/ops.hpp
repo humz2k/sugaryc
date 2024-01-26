@@ -113,9 +113,14 @@ static inline __attribute__((always_inline)) int __neq__(T* t, T2 t2) {
     return t != t2;
 }
 
-template <typename T>
+/*template <typename T>
 static inline __attribute__((always_inline)) T* __index__(T* t, int* idx, int nidx) {
     return &t[idx[0]];
+}*/
+
+template <typename T>
+static inline __attribute__((always_inline)) T* __index__(T* t, int idx){
+    return &t[idx];
 }
 
 //Yes, this is gross and bad but I like syntax sugar. If you want performance, just do *(ptr + idx).
@@ -154,6 +159,8 @@ static inline __attribute__((always_inline)) T* _var_args_to_ptr(T i, Args... ar
 
 //#define __index_wrapper__(var,...) (*__index__(var,(int[]){__VA_ARGS__},_n_var_args(__VA_ARGS__)))
 #define __index_wrapper__(var,...) (*__index__(var,_var_args_to_ptr(__VA_ARGS__),_n_var_args(__VA_ARGS__)))
+
+#define __index_wrapper_simple__(...) (*__index__(__VA_ARGS__))
 
 static inline const char* __str__(_Bool i){
     if (i == false)return "false";

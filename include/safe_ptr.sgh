@@ -25,10 +25,16 @@ generated std.safe_ptr, std.alloc_safe <T>{
         return std.alloc_safe<T>(1);
     }
 
-    static inline T* __index__(std.safe_ptr<T> ptr, int* idxs, int n){
+    /*static inline T* __index__(std.safe_ptr<T> ptr, int* idxs, int n){
         assert(n == 1);
         T* raw = ptr.raw.get();
         int idx = idxs[0];
+        assert(idx < (ptr.sz));
+        return &raw[idx];
+    }*/
+
+    static inline T* __index__(std.safe_ptr<T> ptr, int idx){
+        T* raw = ptr.raw.get();
         assert(idx < (ptr.sz));
         return &raw[idx];
     }

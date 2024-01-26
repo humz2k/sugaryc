@@ -38,8 +38,12 @@ generated std.vector, std.make_vector <T> {
         vec->allocated = new_allocated;
     }
 
-    static inline T* __index__(std.vector<T> vec, int* idxs, int n){
+    /*static inline T* __index__(std.vector<T> vec, int* idxs, int n){
         int idx = idxs[0];
+        return vec->raw + idx;
+    }*/
+
+    static inline T* __index__(std.vector<T> vec, int idx){
         return vec->raw + idx;
     }
 

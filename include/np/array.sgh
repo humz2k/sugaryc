@@ -21,7 +21,9 @@ typedef struct {
 
 shape_t make_shape_t(int* dims, int n);
 
-const int* __index__(shape_t dims, int* idxs, int nidx);
+//const int* __index__(shape_t dims, int* idxs, int nidx);
+
+const int* __index__(shape_t dims, int idx);
 
 int len(shape_t dims);
 
@@ -54,6 +56,14 @@ template <T=types>{
     np.ndarray<T> np.zeros<T>(shape_t dims);
 
     T* __index__(np.ndarray<T> arr, int* idxs, int nidx);
+
+    T* __index__(np.ndarray<T> arr, int idx);
+
+    T* __index__(np.ndarray<T> arr, int idx1, int idx2);
+
+    T* __index__(np.ndarray<T> arr, int idx1, int idx2, int idx3);
+
+    T* __index__(np.ndarray<T> arr, int idx1, int idx2, int idx3, int idx4);
 
     void destroy(np.ndarray<T> arr);
 

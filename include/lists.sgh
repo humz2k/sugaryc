@@ -97,10 +97,17 @@ generated std.list, std.make_list <T>{
 
     }
 
-    static inline T* __index__(std.list<T> lst, int* idxs, int n){
+    /*static inline T* __index__(std.list<T> lst, int* idxs, int n){
         assert(lst != NULL);
         assert(n == 1);
         int idx = idxs[0];
+        assert(idx < lst->length);
+        assert(lst->raw != NULL);
+        return &(lst->raw[idx]);
+    }*/
+
+    static inline T* __index__(std.list<T> lst, int idx){
+        assert(lst != NULL);
         assert(idx < lst->length);
         assert(lst->raw != NULL);
         return &(lst->raw[idx]);
