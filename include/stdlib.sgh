@@ -17,8 +17,6 @@ extern void free(void*);
 
 #include <print.sgh>
 
-#include <int_tuple.sgh>
-
 #include <vector_types.sgh>
 
 #define __device__
