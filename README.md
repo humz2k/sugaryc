@@ -3,9 +3,7 @@
 C, but with function overloading, operator overloading, modules, templates, and uniform function call syntax (and a garbage collector).
 
 ## Building
-Run `chmod +x build.sh; ./build.sh` to build the standard library, header files and pycparser scripts.
-
-OR run `make clean; make all` in `cstdlib`, `make clean; make libsgc.a` in `stdlib` and `python3 _build_tables.py` in `pycparser`.
+Run `chmod +x build.sh; ./build.sh` to build the standard library, header files and pycparser scripts, OR run `make clean; make all` in `cstdlib`, `make clean; make libsgc.a` in `stdlib` and `python3 _build_tables.py` in `pycparser`.
 
 ## Using the compiler
 
