@@ -65,3 +65,5 @@ foreach(auto i in ptr){
     print(i);
 }
 ```
+
+See `range.sgh` and `lists.sgh` in `include` for examples.
