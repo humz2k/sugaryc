@@ -211,6 +211,270 @@ template<T1 = types>{
 
 }
 
+template<o = +,-,*,/>{
+
+    template<T = types>{
+
+        np.ndarray<T> op<o>(np.ndarray<T> l, T r){
+            np.ndarray<T> out = np.array<T>(l.shape);
+            for (int i = 0; i < out.size; i++){
+                out.raw[i] = l.raw[i] o r;
+            }
+            return out;
+        }
+
+        np.ndarray<T> op<o>(T r, np.ndarray<T> l){
+            np.ndarray<T> out = np.array<T>(l.shape);
+            for (int i = 0; i < out.size; i++){
+                out.raw[i] = r o l.raw[i] ;
+            }
+            return out;
+        }
+
+    }
+
+    np.ndarray<double> op<o>(np.ndarray<float> l, double r){
+        np.ndarray<double> out = np.array<double>(l.shape);
+        for (int i = 0; i < out.size; i++){
+            out.raw[i] = l.raw[i] o r;
+        }
+        return out;
+    }
+
+    np.ndarray<double> op<o>(double r, np.ndarray<float> l){
+        np.ndarray<double> out = np.array<double>(l.shape);
+        for (int i = 0; i < out.size; i++){
+            out.raw[i] = r o l.raw[i];
+        }
+        return out;
+    }
+
+    np.ndarray<double> op<o>(np.ndarray<double> l, float r){
+        np.ndarray<double> out = np.array<double>(l.shape);
+        for (int i = 0; i < out.size; i++){
+            out.raw[i] = l.raw[i] o r;
+        }
+        return out;
+    }
+
+    np.ndarray<double> op<o>(float r, np.ndarray<double> l){
+        np.ndarray<double> out = np.array<double>(l.shape);
+        for (int i = 0; i < out.size; i++){
+            out.raw[i] = r o l.raw[i];
+        }
+        return out;
+    }
+
+    template<T1 = float_types>{
+        template<T = int_types>{
+
+            np.ndarray<T1> op<o>(np.ndarray<T1> l, T r){
+                np.ndarray<T1> out = np.array<T1>(l.shape);
+                for (int i = 0; i < out.size; i++){
+                    out.raw[i] = l.raw[i] o r;
+                }
+                return out;
+            }
+
+            np.ndarray<T1> op<o>(np.ndarray<T> l, T1 r){
+                np.ndarray<T1> out = np.array<T1>(l.shape);
+                for (int i = 0; i < out.size; i++){
+                    out.raw[i] = l.raw[i] o r;
+                }
+                return out;
+            }
+
+            np.ndarray<T1> op<o>(T r, np.ndarray<T1> l){
+                np.ndarray<T1> out = np.array<T1>(l.shape);
+                for (int i = 0; i < out.size; i++){
+                    out.raw[i] = r o l.raw[i];
+                }
+                return out;
+            }
+
+            np.ndarray<T1> op<o>(T1 r, np.ndarray<T> l){
+                np.ndarray<T1> out = np.array<T1>(l.shape);
+                for (int i = 0; i < out.size; i++){
+                    out.raw[i] = r o l.raw[i];
+                }
+                return out;
+            }
+
+        }
+    }
+
+}
+
+template<T = types>{
+
+    np.ndarray<T> __add__(np.ndarray<T> l, T r){
+        return op<+>(l,r);
+    }
+
+    np.ndarray<T> __add__(T r, np.ndarray<T> l){
+        return op<+>(r,l);
+    }
+
+    np.ndarray<T> __sub__(np.ndarray<T> l, T r){
+        return op<->(l,r);
+    }
+
+    np.ndarray<T> __sub__(T r, np.ndarray<T> l){
+        return op<->(r,l);
+    }
+
+    np.ndarray<T> __div__(np.ndarray<T> l, T r){
+        return op</>(l,r);
+    }
+
+    np.ndarray<T> __div__(T r, np.ndarray<T> l){
+        return op</>(r,l);
+    }
+
+    np.ndarray<T> __mul__(np.ndarray<T> l, T r){
+        return op<*>(l,r);
+    }
+
+    np.ndarray<T> __mul__(T r, np.ndarray<T> l){
+        return op<*>(r,l);
+    }
+
+}
+
+template<T1 = float_types>{
+    template<T = int_types>{
+
+        np.ndarray<T1> __add__(np.ndarray<T1> l, T r){
+            return op<+>(l,r);
+        }
+
+        np.ndarray<T1> __add__(T r, np.ndarray<T1> l){
+            return op<+>(r,l);
+        }
+
+        np.ndarray<T1> __sub__(np.ndarray<T1> l, T r){
+            return op<->(l,r);
+        }
+
+        np.ndarray<T1> __sub__(T r, np.ndarray<T1> l){
+            return op<->(r,l);
+        }
+
+        np.ndarray<T1> __div__(np.ndarray<T1> l, T r){
+            return op</>(l,r);
+        }
+
+        np.ndarray<T1> __div__(T r, np.ndarray<T1> l){
+            return op</>(r,l);
+        }
+
+        np.ndarray<T1> __mul__(np.ndarray<T1> l, T r){
+            return op<*>(l,r);
+        }
+
+        np.ndarray<T1> __mul__(T r, np.ndarray<T1> l){
+            return op<*>(r,l);
+        }
+
+        np.ndarray<T1> __add__(np.ndarray<T> l, T1 r){
+            return op<+>(l,r);
+        }
+
+        np.ndarray<T1> __add__(T1 r, np.ndarray<T> l){
+            return op<+>(r,l);
+        }
+
+        np.ndarray<T1> __sub__(np.ndarray<T> l, T1 r){
+            return op<->(l,r);
+        }
+
+        np.ndarray<T1> __sub__(T1 r, np.ndarray<T> l){
+            return op<->(r,l);
+        }
+
+        np.ndarray<T1> __div__(np.ndarray<T> l, T1 r){
+            return op</>(l,r);
+        }
+
+        np.ndarray<T1> __div__(T1 r, np.ndarray<T> l){
+            return op</>(r,l);
+        }
+
+        np.ndarray<T1> __mul__(np.ndarray<T> l, T1 r){
+            return op<*>(l,r);
+        }
+
+        np.ndarray<T1> __mul__(T1 r, np.ndarray<T> l){
+            return op<*>(r,l);
+        }
+
+    }
+}
+
+np.ndarray<double> __add__(np.ndarray<double> l, float r){
+    return op<+>(l,r);
+}
+
+np.ndarray<double> __add__(float r, np.ndarray<double> l){
+    return op<+>(r,l);
+}
+
+np.ndarray<double> __sub__(np.ndarray<double> l, float r){
+    return op<->(l,r);
+}
+
+np.ndarray<double> __sub__(float r, np.ndarray<double> l){
+    return op<->(r,l);
+}
+
+np.ndarray<double> __div__(np.ndarray<double> l, float r){
+    return op</>(l,r);
+}
+
+np.ndarray<double> __div__(float r, np.ndarray<double> l){
+    return op</>(r,l);
+}
+
+np.ndarray<double> __mul__(np.ndarray<double> l, float r){
+    return op<*>(l,r);
+}
+
+np.ndarray<double> __mul__(float r, np.ndarray<double> l){
+    return op<*>(r,l);
+}
+
+np.ndarray<double> __add__(np.ndarray<float> l, double r){
+    return op<+>(l,r);
+}
+
+np.ndarray<double> __add__(double r, np.ndarray<float> l){
+    return op<+>(r,l);
+}
+
+np.ndarray<double> __sub__(np.ndarray<float> l, double r){
+    return op<->(l,r);
+}
+
+np.ndarray<double> __sub__(double r, np.ndarray<float> l){
+    return op<->(r,l);
+}
+
+np.ndarray<double> __div__(np.ndarray<float> l, double r){
+    return op</>(l,r);
+}
+
+np.ndarray<double> __div__(double r, np.ndarray<float> l){
+    return op</>(r,l);
+}
+
+np.ndarray<double> __mul__(np.ndarray<float> l, double r){
+    return op<*>(l,r);
+}
+
+np.ndarray<double> __mul__(double r, np.ndarray<float> l){
+    return op<*>(r,l);
+}
+
 template<T = float_types>{
 
     np.ndarray<T> np.linspace<T>(T start, T stop, int n){

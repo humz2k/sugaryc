@@ -1,0 +1,138 @@
+#include <stdlib.sgh>
+#include <string.sgh>
+#include <assert.sgh>
+#include <np/array.sgh>
+
+module np;
+
+template <T=types>{
+
+    template <o = ops>{
+
+        np.ndarray<T> op<o>(np.ndarray<T> arr1, np.ndarray<T> arr2){
+            
+            int found = 1;
+            int dim1; int dim2;
+            int arr1ndims = len(arr1.shape);
+            int arr2ndims = len(arr2.shape);
+            int output_ndims = arr1ndims;
+            if (arr2ndims > output_ndims){
+                output_ndims = arr2ndims;
+            }
+
+            int* arr1dims = (int*)GC_malloc(sizeof(int)*output_ndims);
+            int* arr2dims = (int*)GC_malloc(sizeof(int)*output_ndims);
+            for (int i = 0; i < output_ndims; i++){
+                arr1dims[i] = 1;
+                arr2dims[i] = 1;
+            }
+
+            int* output_dims = (int*)GC_malloc(sizeof(int)*output_ndims);
+            int count = output_ndims - 1;
+            for (dim1 = arr1ndims-1; dim1 >= 0; dim1--){
+                arr1dims[count] = arr1.shape[dim1];
+                count--;
+            }        
+            count = output_ndims-1;
+            for(dim2 = arr2ndims-1; dim2 >= 0; dim2--){
+                arr2dims[count] = arr2.shape[dim2];
+                count--;
+            }
+
+            for (int i = output_ndims - 1; i >= 0; i--){
+                if (!(((arr1dims[i] == arr2dims[i]) || (arr1dims[i] == 1)) || (arr2dims[i] == 1))){
+                    found = 0;break;
+                }
+                output_dims[i] = arr1dims[i];
+                if(arr2dims[i] > output_dims[i]){
+                    output_dims[i] = arr2dims[i];
+                }
+            }
+            assert(found == 1);
+
+            int* copy_dims = (int*)GC_malloc(sizeof(int)*output_ndims);
+            for (int i = 0; i < output_ndims; i++){
+                copy_dims[i] = output_dims[i];
+            }
+
+            np.ndarray<T> out = np.array<T>(make_shape_t(copy_dims,output_ndims));
+
+            int size = 1;
+            for (int i = 0; i < output_ndims; i++){
+                size = size * output_dims[i];
+                output_dims[i]--;
+            }
+            
+            int arr1offset = output_ndims - arr1ndims;
+            int arr2offset = output_ndims - arr2ndims;
+
+            int arr1muls[arr1ndims];
+            for (int i = 0; i < arr1ndims; i++){
+                arr1muls[i] = 1;
+                for (int j = i+1; j < arr1ndims; j++){
+                    arr1muls[i] *= arr1.shape[j];
+                }
+            }
+            int arr2muls[arr2ndims];
+            for (int i = 0; i < arr2ndims; i++){
+                arr2muls[i] = 1;
+                for (int j = i+1; j < arr2ndims; j++){
+                    arr2muls[i] *= arr2.shape[j];
+                }
+            }
+
+            for (int i = 0; i < size; i++){
+                int output_index = 0;
+                int arr1_index = 0;
+                int arr2_index = 0;
+                output_index = output_dims[0];
+                for (int i = 1; i < output_ndims; i++){
+                    output_index *= out.shape[i];
+                    output_index += output_dims[i];
+                }
+                for (int j = arr1offset; j < output_ndims; j++){
+                    if (arr1dims[j] != 1){
+                        arr1_index = arr1_index + arr1muls[j-arr1offset]*output_dims[j];
+                    }
+                }
+                for (int j = arr2offset; j < output_ndims; j++){
+                    if (arr2dims[j] != 1){
+                        arr2_index = arr2_index + arr2muls[j-arr2offset]*output_dims[j];
+                    }
+                }
+                out.raw[output_index] = arr1.raw[arr1_index] o arr2.raw[arr2_index];
+                output_dims[output_ndims-1]--;
+                for (int j = output_ndims-1; j > 0; j--){
+                    if (output_dims[j] < 0){
+                        output_dims[j] = out.shape[j] - 1;
+                        output_dims[j-1]--;
+                    }
+                }
+                if (output_dims[0] < 0){
+                    break;
+                }
+            }
+
+            return out;
+
+        }
+
+    }
+
+    np.ndarray<T> __add__(np.ndarray<T> l, np.ndarray<T> r){
+        return op<+>(l,r);
+    }
+
+    np.ndarray<T> __sub__(np.ndarray<T> l, np.ndarray<T> r){
+        return op<->(l,r);
+    }
+
+    np.ndarray<T> __mul__(np.ndarray<T> l, np.ndarray<T> r){
+        return op<*>(l,r);
+    }
+
+    np.ndarray<T> __div__(np.ndarray<T> l, np.ndarray<T> r){
+        return op</>(l,r);
+    }
+
+}

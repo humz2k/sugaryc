@@ -8,6 +8,8 @@
 #define float_types float,double
 #define int_types short,int,long,long long,unsigned short,unsigned int,unsigned long,unsigned long long
 
+#define ops +,*,-,/
+
 #define types float_types,int_types
 
 #define Shape(...) make_shape_t(_var_args_to_ptr(__VA_ARGS__),_n_var_args(__VA_ARGS__))
@@ -81,6 +83,96 @@ template<T = float_types>{
 
 }
 
+template<T = types>{
+
+    np.ndarray<T> __add__(np.ndarray<T> l, T r);
+
+    np.ndarray<T> __add__(T r, np.ndarray<T> l);
+
+    np.ndarray<T> __sub__(np.ndarray<T> l, T r);
+
+    np.ndarray<T> __sub__(T r, np.ndarray<T> l);
+
+    np.ndarray<T> __div__(np.ndarray<T> l, T r);
+
+    np.ndarray<T> __div__(T r, np.ndarray<T> l);
+
+    np.ndarray<T> __mul__(np.ndarray<T> l, T r);
+
+    np.ndarray<T> __mul__(T r, np.ndarray<T> l);
+
+}
+
+template<T1 = float_types>{
+    template<T = int_types>{
+
+        np.ndarray<T1> __add__(np.ndarray<T1> l, T r);
+
+        np.ndarray<T1> __add__(T r, np.ndarray<T1> l);
+
+        np.ndarray<T1> __sub__(np.ndarray<T1> l, T r);
+
+        np.ndarray<T1> __sub__(T r, np.ndarray<T1> l);
+
+        np.ndarray<T1> __div__(np.ndarray<T1> l, T r);
+
+        np.ndarray<T1> __div__(T r, np.ndarray<T1> l);
+
+        np.ndarray<T1> __mul__(np.ndarray<T1> l, T r);
+
+        np.ndarray<T1> __mul__(T r, np.ndarray<T1> l);
+
+        np.ndarray<T1> __add__(np.ndarray<T> l, T1 r);
+
+        np.ndarray<T1> __add__(T1 r, np.ndarray<T> l);
+
+        np.ndarray<T1> __sub__(np.ndarray<T> l, T1 r);
+
+        np.ndarray<T1> __sub__(T1 r, np.ndarray<T> l);
+
+        np.ndarray<T1> __div__(np.ndarray<T> l, T1 r);
+
+        np.ndarray<T1> __div__(T1 r, np.ndarray<T> l);
+
+        np.ndarray<T1> __mul__(np.ndarray<T> l, T1 r);
+
+        np.ndarray<T1> __mul__(T1 r, np.ndarray<T> l);
+
+    }
+}
+
+np.ndarray<double> __add__(np.ndarray<double> l, float r);
+
+np.ndarray<double> __add__(float r, np.ndarray<double> l);
+
+np.ndarray<double> __sub__(np.ndarray<double> l, float r);
+
+np.ndarray<double> __sub__(float r, np.ndarray<double> l);
+
+np.ndarray<double> __div__(np.ndarray<double> l, float r);
+
+np.ndarray<double> __div__(float r, np.ndarray<double> l);
+
+np.ndarray<double> __mul__(np.ndarray<double> l, float r);
+
+np.ndarray<double> __mul__(float r, np.ndarray<double> l);
+
+np.ndarray<double> __add__(np.ndarray<float> l, double r);
+
+np.ndarray<double> __add__(double r, np.ndarray<float> l);
+
+np.ndarray<double> __sub__(np.ndarray<float> l, double r);
+
+np.ndarray<double> __sub__(double r, np.ndarray<float> l);
+
+np.ndarray<double> __div__(np.ndarray<float> l, double r);
+
+np.ndarray<double> __div__(double r, np.ndarray<float> l);
+
+np.ndarray<double> __mul__(np.ndarray<float> l, double r);
+
+np.ndarray<double> __mul__(double r, np.ndarray<float> l);
+
 np.ndarray<float> np.linspace(float start, float stop, int n);
 
 np.ndarray<float> np.ones(shape_t dims);
@@ -88,5 +180,17 @@ np.ndarray<float> np.ones(shape_t dims);
 np.ndarray<float> np.array(shape_t dims);
 
 np.ndarray<float> np.zeros(shape_t dims);
+
+template <T=types>{
+
+    np.ndarray<T> __add__(np.ndarray<T> l, np.ndarray<T> r);
+
+    np.ndarray<T> __sub__(np.ndarray<T> l, np.ndarray<T> r);
+
+    np.ndarray<T> __mul__(np.ndarray<T> l, np.ndarray<T> r);
+
+    np.ndarray<T> __div__(np.ndarray<T> l, np.ndarray<T> r);
+
+}
 
 #endif

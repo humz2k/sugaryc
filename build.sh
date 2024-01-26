@@ -2,12 +2,12 @@
 
 cd cstdlib
 make clean
-make all
+make all -j
 cd ..
 
 cd stdlib
 make clean
-make libsgc.a
+make libsgc.a -j
 cd ..
 
 cd pycparser
@@ -18,5 +18,5 @@ cd ..
 
 cd examples
 make clean
-make
+make -j
 cd ..
