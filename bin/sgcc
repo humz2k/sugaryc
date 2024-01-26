@@ -293,7 +293,7 @@ static inline const char* to_str(T in){
     with open(temp_file,"w") as f:
         f.write(out)
 
-    error_file = "__sgc_errors" + temp_file + ".json"
+    error_file = "__sgc_errors" + temp_file.replace("/","_") + ".json"
 
     command = cxx + " -O" + str(O) + " " + " -c " + temp_file + " -o " + outfile + " -Wno-c++11-extensions -fdiagnostics-format=json"
     if (openmp):
