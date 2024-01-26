@@ -49,3 +49,20 @@ int main(){
     return 0;
 }
 ```
+
+## FAQs
+
+### Why?
+Idk.
+
+### Why not just use C++?
+I don't like C++ very much.
+
+### Why garbage collection?
+It makes things easy.
+
+### Who is this for?
+Me. If you like C, maybe you too.
+
+### Is this just regex and macro abuse?
+Yes.
