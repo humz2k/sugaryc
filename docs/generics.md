@@ -62,7 +62,9 @@ generated keyword1,keyword2,keyword3<T>{
     } my_generated_type<T>;
 }
 ```
-will generate a `my_generated_type<T>` if any of `keyword1<T>`, `keyword2<T>` or `keyword3<T>` show up. Don't nest generated types. It might work, but it depends on the ordering of when things are expanded, and I'll likely change this in the future. Also, don't have a `generated` inside a `template`. Again, it may work, but things get weird.
+will generate a `my_generated_type<T>` if any of `keyword1<T>`, `keyword2<T>` or `keyword3<T>` show up. Unlike `template`s, `generated`s can take multiple inputs. 
+
+### Don't nest generated types. It might work, but it depends on the ordering of when things are expanded, and I'll likely change this in the future. Also, don't have a `generated` inside a `template`. Again, it may work, but things get weird.
 
 One thing to note is that the generated code is placed in the same location as the original code. This is important. For example:
 
