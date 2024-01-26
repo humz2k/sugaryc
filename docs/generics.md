@@ -42,7 +42,7 @@ template<T=int,float>{
     }
 }
 ```
-is perfectly valid.
+is perfectly valid. You should in theory be able to nest templates, but this can get weird. See `stdlib/np/array.sgc` for an example.
 
 ## Generateds
 
@@ -98,6 +98,10 @@ my_type<struct my_struct>;
 Because `struct my_struct` is not declared before `my_type<struct my_struct>`, the compiler will freak out. So for situations where you are including a `generated` (for example from the standard library), note that they need to be included AFTER any relevant declarations.
 
 I know, this is annoying. But it makes it simple to implement, and also to reason about.
+
+## What `thing<other thing>` actually does
+
+Like everything else, `thing<other thing>` just substitutes this with text. So you can really have that anywhere, as another way to mangle names. You can also nest them. 
 
 ## Abuse
 
