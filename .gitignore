@@ -163,3 +163,5 @@ test.c
 test.sgc
 bin/ref_counter.cpp
 cstdlib/*.h
+
+.DS_Store
