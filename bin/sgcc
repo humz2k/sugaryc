@@ -293,7 +293,7 @@ static inline const char* to_str(T in){
     with open(temp_file,"w") as f:
         f.write(out)
 
-    error_file = "__sgc_errors.json"
+    error_file = "__sgc_errors" + temp_file + ".json"
 
     command = cxx + " -O" + str(O) + " " + " -c " + temp_file + " -o " + outfile + " -Wno-c++11-extensions -fdiagnostics-format=json"
     if (openmp):
@@ -332,9 +332,10 @@ if __name__ == "__main__":
     parser.add_argument('-c',action='store_true',default=False)
     parser.add_argument('-O',metavar="<opt>",type=int,default=3)
     parser.add_argument('--echo',action='store_true',default=False)
-    parser.add_argument('-I',metavar="<I>",type=str,nargs='+')
-    parser.add_argument('-L',metavar="<L>",type=str,nargs='+')
-    parser.add_argument('-l',metavar="<l>",type=str,nargs='+')
+    parser.add_argument('-I',metavar="<I>",type=str,nargs='+',action="append")
+    parser.add_argument('-L',metavar="<L>",type=str,nargs='+',action="append")
+    parser.add_argument('-l',metavar="<l>",type=str,nargs='+',action="append")
+    parser.add_argument('-framework',metavar="<framework>",type=str,nargs='+',action="append")
     parser.add_argument('--no-parallel',action='store_true',default=False)
     parser.add_argument('--save-temps','-S',action='store_true',default=False)
 
@@ -346,16 +347,21 @@ if __name__ == "__main__":
     includes = []
     link_dir = []
     links = []
+    frameworks = []
     try:
-        includes = ["-I" + i for i in args.I]
+        includes = ["-I" + i[0] for i in args.I]
     except:
         pass
     try:
-        link_dir = ["-L" + i for i in args.L]
+        link_dir = ["-L" + i[0] for i in args.L]
     except:
         pass
     try:
-        links = ["-l" + i for i in args.l]
+        links = ["-l" + i[0] for i in args.l]
+    except:
+        pass
+    try:
+        frameworks = ["-framework " + i[0] for i in args.framework]
     except:
         pass
 
@@ -363,14 +369,13 @@ if __name__ == "__main__":
         compile_file(to_compile[0],args.o,includes,O = args.O,cxx = args.cxx,keep_temp = args.save_temps, echo = args.echo, openmp = not args.no_parallel)
 
     else:
-
         intermediate_outputs = [i.split(".")[0] + "__tmp.o" for i in to_compile]
         
         for i,j in zip(to_compile,intermediate_outputs):
             if compile_file(i,j,includes,O = args.O,cxx = args.cxx,keep_temp = args.save_temps, echo = args.echo, openmp = not args.no_parallel) != 0:
                 exit()
 
-        link_command = args.cxx + " -o " + args.o + " -O" + str(args.O) + " " + " ".join(intermediate_outputs + to_link) + " " + " ".join(includes + link_dir + links)
+        link_command = args.cxx + " -o " + args.o + " -O" + str(args.O) + " " + " ".join(intermediate_outputs + to_link) + " " + " ".join(includes + link_dir + links + frameworks)
 
         if (not args.no_parallel):
             link_command += " -fopenmp"
