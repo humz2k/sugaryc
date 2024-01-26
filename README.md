@@ -4,6 +4,8 @@ C, but with function overloading, operator overloading, modules (kind of), templ
 
 Sugaryc is (almost) a strict superset of C, with extra features that try to make C prettier while keeping overhead relatively low.
 
+See `docs` (https://github.com/humz2k/sugaryc/tree/main/docs) for documentation.
+
 ## Getting Started
 
 ### Building
