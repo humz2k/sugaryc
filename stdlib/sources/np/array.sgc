@@ -1,7 +1,7 @@
 #include <stdlib.sgh>
 #include <string.sgh>
 #include <assert.sgh>
-#include <nptools/nparray.sgh>
+#include <np/array.sgh>
 
 shape_t make_shape_t(int* dims, int n){
     shape_t out;
