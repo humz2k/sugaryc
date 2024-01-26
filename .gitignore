@@ -162,3 +162,4 @@ old
 test.c
 test.sgc
 bin/ref_counter.cpp
+cstdlib/*.h
