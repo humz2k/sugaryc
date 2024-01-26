@@ -1,3 +1,9 @@
+SOURCES := $(shell find . -name '*.c')
+OBJECTS := $(SOURCES:%.c=%.h)
+
+.PHONY: all
+all: $(OBJECTS)
+
 %.h: %.o
 	./$< > $@
 
