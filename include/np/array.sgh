@@ -181,6 +181,22 @@ np.ndarray<float> np.array(shape_t dims);
 
 np.ndarray<float> np.zeros(shape_t dims);
 
+template<T = int_types>{
+
+    np.ndarray<T> np.arange<T>(T start, T stop, T step);
+
+    np.ndarray<T> np.arange<T>(T start, T stop);
+
+    np.ndarray<T> np.arange<T>(T stop);
+
+}
+
+np.ndarray<int> np.arange(int start, int stop, int step);
+
+np.ndarray<int> np.arange(int start, int stop);
+
+np.ndarray<int> np.arange(int stop);
+
 template <T=types>{
 
     np.ndarray<T> __add__(np.ndarray<T> l, np.ndarray<T> r);
@@ -191,6 +207,108 @@ template <T=types>{
 
     np.ndarray<T> __div__(np.ndarray<T> l, np.ndarray<T> r);
 
+}
+
+template <T=types>{
+
+    np.ndarray<T> __add__(np.ndarray<T> l, np.ndarray<T> r);
+
+    np.ndarray<T> __sub__(np.ndarray<T> l, np.ndarray<T> r);
+
+    np.ndarray<T> __mul__(np.ndarray<T> l, np.ndarray<T> r);
+
+    np.ndarray<T> __div__(np.ndarray<T> l, np.ndarray<T> r);
+
+}
+
+template<T1 = float_types>{
+    template<T2 = int_types>{
+
+        np.ndarray<T1> __add__(np.ndarray<T1> l, np.ndarray<T2> r);
+
+        np.ndarray<T1> __sub__(np.ndarray<T1> l, np.ndarray<T2> r);
+
+        np.ndarray<T1> __mul__(np.ndarray<T1> l, np.ndarray<T2> r);
+
+        np.ndarray<T1> __div__(np.ndarray<T1> l, np.ndarray<T2> r);
+
+        np.ndarray<T1> __add__(np.ndarray<T2> l, np.ndarray<T1> r);
+
+        np.ndarray<T1> __sub__(np.ndarray<T2> l, np.ndarray<T1> r);
+
+        np.ndarray<T1> __mul__(np.ndarray<T2> l, np.ndarray<T1> r);
+
+        np.ndarray<T1> __div__(np.ndarray<T2> l, np.ndarray<T1> r);
+
+    }
+}
+
+np.ndarray<double> __add__(np.ndarray<double> l, np.ndarray<float> r);
+
+np.ndarray<double> __sub__(np.ndarray<double> l, np.ndarray<float> r);
+
+np.ndarray<double> __mul__(np.ndarray<double> l, np.ndarray<float> r);
+
+np.ndarray<double> __div__(np.ndarray<double> l, np.ndarray<float> r);
+
+np.ndarray<double> __add__(np.ndarray<float> l, np.ndarray<double> r);
+
+np.ndarray<double> __sub__(np.ndarray<float> l, np.ndarray<double> r);
+
+np.ndarray<double> __mul__(np.ndarray<float> l, np.ndarray<double> r);
+
+np.ndarray<double> __div__(np.ndarray<float> l, np.ndarray<double> r);
+
+template<T = float_types>{
+    np.ndarray<T> np.sin(np.ndarray<T> arr);
+
+    np.ndarray<T> np.cos(np.ndarray<T> arr);
+
+    np.ndarray<T> np.tan(np.ndarray<T> arr);
+
+    np.ndarray<T> np.asin(np.ndarray<T> arr);
+
+    np.ndarray<T> np.acos(np.ndarray<T> arr);
+
+    np.ndarray<T> np.atan(np.ndarray<T> arr);
+
+    T np.sin(T in);
+
+    T np.cos(T in);
+
+    T np.tan(T in);
+
+    T np.asin(T in);
+
+    T np.acos(T in);
+
+    T np.atan(T in);
+}
+
+template<T = int_types>{
+    np.ndarray<double> np.sin(np.ndarray<T> arr);
+
+    np.ndarray<double> np.cos(np.ndarray<T> arr);
+
+    np.ndarray<double> np.tan(np.ndarray<T> arr);
+
+    np.ndarray<double> np.asin(np.ndarray<T> arr);
+
+    np.ndarray<double> np.acos(np.ndarray<T> arr);
+
+    np.ndarray<double> np.atan(np.ndarray<T> arr);
+
+    double np.sin(T in);
+
+    double np.cos(T in);
+
+    double np.tan(T in);
+
+    double np.asin(T in);
+
+    double np.acos(T in);
+
+    double np.atan(T in);
 }
 
 #endif

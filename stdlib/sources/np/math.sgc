@@ -1,0 +1,119 @@
+#include <stdlib.sgh>
+#include <string.sgh>
+#include <assert.sgh>
+#include <np/array.sgh>
+#include <math.sgh>
+
+module np;
+
+generated npmath <T1,T2,func>{
+
+    np.ndarray<T2> npmath<T1,T2,func>(np.ndarray<T1> arr){
+        np.ndarray<T2> out = np.array<T2>(arr.shape);
+        for (int i = 0; i < out.size; i++){
+            out.raw[i] = func((T2)arr.raw[i]);
+        }
+        return out;
+    }
+
+}
+
+template<T = float_types>{
+    np.ndarray<T> np.sin(np.ndarray<T> arr){
+        return npmath<T,T,sin>(arr);
+    }
+
+    np.ndarray<T> np.cos(np.ndarray<T> arr){
+        return npmath<T,T,cos>(arr);
+    }
+
+    np.ndarray<T> np.tan(np.ndarray<T> arr){
+        return npmath<T,T,tan>(arr);
+    }
+
+    np.ndarray<T> np.asin(np.ndarray<T> arr){
+        return npmath<T,T,asin>(arr);
+    }
+
+    np.ndarray<T> np.acos(np.ndarray<T> arr){
+        return npmath<T,T,acos>(arr);
+    }
+
+    np.ndarray<T> np.atan(np.ndarray<T> arr){
+        return npmath<T,T,atan>(arr);
+    }
+
+    T np.sin(T in){
+        return sin(in);
+    }
+
+    T np.cos(T in){
+        return cos(in);
+    }
+
+    T np.tan(T in){
+        return tan(in);
+    }
+
+    T np.asin(T in){
+        return asin(in);
+    }
+
+    T np.acos(T in){
+        return acos(in);
+    }
+
+    T np.atan(T in){
+        return atan(in);
+    }
+}
+
+template<T = int_types>{
+    np.ndarray<double> np.sin(np.ndarray<T> arr){
+        return npmath<T,double,sin>(arr);
+    }
+
+    np.ndarray<double> np.cos(np.ndarray<T> arr){
+        return npmath<T,double,cos>(arr);
+    }
+
+    np.ndarray<double> np.tan(np.ndarray<T> arr){
+        return npmath<T,double,tan>(arr);
+    }
+
+    np.ndarray<double> np.asin(np.ndarray<T> arr){
+        return npmath<T,double,asin>(arr);
+    }
+
+    np.ndarray<double> np.acos(np.ndarray<T> arr){
+        return npmath<T,double,acos>(arr);
+    }
+
+    np.ndarray<double> np.atan(np.ndarray<T> arr){
+        return npmath<T,double,atan>(arr);
+    }
+
+    double np.sin(T in){
+        return sin((double)in);
+    }
+
+    double np.cos(T in){
+        return cos((double)in);
+    }
+
+    double np.tan(T in){
+        return tan((double)in);
+    }
+
+    double np.asin(T in){
+        return asin((double)in);
+    }
+
+    double np.acos(T in){
+        return acos((double)in);
+    }
+
+    double np.atan(T in){
+        return atan((double)in);
+    }
+}

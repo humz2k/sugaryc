@@ -490,6 +490,39 @@ template<T = float_types>{
 
 }
 
+template<T = int_types>{
+
+    np.ndarray<T> np.arange<T>(T start, T stop, T step){
+        int n = (stop - start)/step;
+        np.ndarray<T> out = np.array<T>(Shape(n));
+        for (int i = 0; i < n; i++){
+            out[i] = start + step * i;
+        }
+        return out;
+    }
+
+    np.ndarray<T> np.arange<T>(T start, T stop){
+        return np.arange<T>(start,stop,1);
+    }
+
+    np.ndarray<T> np.arange<T>(T stop){
+        return np.arange<T>(0,stop,1);
+    }
+
+}
+
+np.ndarray<int> np.arange(int start, int stop, int step){
+    return np.arange<int>(start,stop,step);
+}
+
+np.ndarray<int> np.arange(int start, int stop){
+    return np.arange<int>(start,stop);
+}
+
+np.ndarray<int> np.arange(int stop){
+    return np.arange<int>(stop);
+}
+
 np.ndarray<float> np.linspace(float start, float stop, int n){
     return np.linspace<float>(start,stop,n);
 }
