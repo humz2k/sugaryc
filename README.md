@@ -7,9 +7,11 @@ Sugaryc is (almost) a strict superset of C, with extra features that try to make
 ## Getting Started
 
 ### Building
-You need `python3` installed.
+You need `python3` installed. 
 
-Run `chmod +x build.sh; ./build.sh` to build the gc, standard library, header files and pycparser scripts.
+First, build the gc with `chmod +x build_gc.sh; ./build_gc.sh`.
+
+Then, run `chmod +x build.sh; ./build.sh` to build the standard library, header files and pycparser scripts.
 
 ### Using the compiler
 

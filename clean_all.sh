@@ -2,21 +2,21 @@
 
 cd cstdlib
 make clean
-make all
 cd ..
 
 cd pycparser
 rm -rf lextab.py
 rm -rf yacctab.py
-python3 _build_tables.py
 cd ..
 
 cd stdlib
 make clean
-make libsgc.a
 cd ..
 
 cd examples
 make clean
-make
+cd ..
+
+cd ext/bdwgc
+make -f makefile.direct clean
 cd ..
