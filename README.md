@@ -1,6 +1,6 @@
 # sugaryc
  
-C, but with function overloading, operator overloading, modules (kind of), templates (kind of), and uniform function call syntax (and a garbage collector).
+C, but with function overloading, operator overloading, modules (kind of), templates (kind of), and uniform function call syntax (and a garbage collector - https://github.com/ivmai/bdwgc).
 
 Sugaryc is (almost) a strict superset of C, with extra features that try to make C prettier while keeping overhead relatively low.
 
