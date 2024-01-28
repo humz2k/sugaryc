@@ -5,208 +5,14 @@ import sys
 import os
 sys.path = [os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))] + sys.path
 from pycparser import c_generator, parse_file, c_ast, ParseError
+from pysgcc import *
 import argparse
 import re
 
-class KernelFixer(c_ast.NodeVisitor):
-    def visit_Decl(self, node : c_ast.Decl):
-        if (not "__global__" in node.quals):
-            return
-        if not isinstance(node.type,c_ast.FuncDecl):
-            return
-        
-        typ = node.type
-
-        if not typ.args:
-            typ.args = c_ast.ParamList(params = [])
-
-        new_inps = []
-        for v in ["blockIdx","blockDim","threadIdx"]:
-            ty = c_ast.TypeDecl(declname=v, quals=[], align=[], type=c_ast.IdentifierType(['int3']))
-            newdecl = c_ast.Decl(name=v,quals=[],align=[],storage=[],funcspec=[],type=ty,init=None,bitsize=None,coord=node.coord)
-            new_inps.append(newdecl)
-        typ.args.params = new_inps + typ.args.params
-
-        node.type = typ
-
-        #print(node)
-        #exit()
-
-def replace_T(code, replacement, T):
-    # Regex pattern to match string literals or \bT\b
-    pattern = r'\"(?:\\.|[^"\\])*\"|\'(?:\\.|[^\'\\])*\'|\b' + T + r'\b'
-
-    def replacer(match):
-        # If the match is T, replace it; otherwise, return the match unchanged
-        return replacement if match.group(0) == T else match.group(0)
-
-    return re.sub(pattern, replacer, code)
-
-class GeneratedTemplate:
-    def __init__(self,gen_strs,code,Ts):
-        self.code = code
-        self.Ts = Ts
-        self.gen_strs = gen_strs
-        self.generated = []
-
-    def get_replacer(self):
-        return "__generate(" + "_".join(self.gen_strs) + "__" + "_".join(self.Ts) + ")\n"
-
-    def generate(self,code,reTs):
-        if (tuple([i.strip().replace(" ","") for i in reTs]) in self.generated):
-            return code
-        self.generated.append(tuple([i.strip().replace(" ","") for i in reTs]))
-        assert(len(reTs) == len(self.Ts))
-        out_str = self.code
-        for t,T in zip(reTs,self.Ts):
-            out_str = replace_T(out_str,t,T)
-        return code.replace(self.get_replacer(),out_str + "\n" + self.get_replacer())
-
-def capture_template(func):
-    out_func = ""
-    count = 0
-    for i in func:
-        if i == "{":
-            count += 1
-        if i == "}":
-            count -= 1
-        if count < 0:
-            break
-        out_func += i
-    return out_func
-
-def handle_templates(raw):
-    #print(raw)
-    out = re.search(r'\btemplate\s*<\b.+\=(.*)>.?\{', raw)
-    if out is None:
-        return raw
-    template_str = out.string[out.span()[0]:out.span()[1]]
-    func = raw[out.span()[1]:]
-    out_func = capture_template(func)
-    template_args = "".join(("".join(template_str.split("<")[1:])).split(">")[:-1])
-    template_T = template_args.split("=")[0].strip()
-    types = [i.strip() for i in template_args.split("=")[1].split(",")]
-    out_str = ""
-    for t in types:
-        out_str += replace_T(out_func,t,template_T) + "\n"
-    to_replace = template_str + out_func + "}"
-    raw = raw.replace(to_replace,out_str)
-    return handle_templates(raw)
-
-generateds = {}
-
-def handle_generated(raw):
-    global generateds
-    #print(raw)
-    out = re.search(r'\bgenerated\b(.+)<(.*)>.?\{', raw)
-    if out is None:
-        return raw
-    gen_strs = [i.strip() for i in out.group(1).split(",")]
-    Ts = [i.strip() for i in out.group(2).split(",")]
-    func = raw[out.span()[1]:]
-    out_func = capture_template(func)
-    template_str = out.string[out.span()[0]:out.span()[1]]
-    to_replace = template_str + out_func + "}"
-    temp = GeneratedTemplate(gen_strs,out_func,Ts)
-    for gen_str in gen_strs:
-        generateds[gen_str] = temp
-    raw = raw.replace(to_replace,temp.get_replacer())
-    
-    return handle_generated(raw)
-
-def replace_innermost_brackets(code):
-    # Pattern to match the innermost angle brackets
-    pattern = r'(\w+)<([^<>]+)>'
-
-    if re.search(pattern,code) is None:
-        return code
-
-    to_gen = []
-    # Function to replace angle brackets with parentheses
-    def replacer(match):
-        # Extract the string before the angle brackets
-        string_before_brackets = match.group(1)
-        gen_str = string_before_brackets.strip()
-        if (gen_str in generateds):
-            Ts = [i.strip() for i in match.group(2).split(",")]
-            to_gen.append((generateds[gen_str],Ts))
-        replaces = {
-            "*": "ptr",
-            "%": "mod",
-            "=": "eq",
-            "+": "add",
-            "-": "sub",
-            "/": "div",
-            "<": "lt",
-            ">": "gt",
-            "(": "lpar",
-            ")": "rpar",
-            "!": "not",
-            "~": "neg",
-            ":": "colon",
-            "?": "question"
-        }
-
-        tmp = [i.strip().replace(" ","") for i in match.group(2).split(",")]
-        out = []
-        for i in tmp:
-            t = i
-            for j in replaces:
-                t = t.replace(j,replaces[j])
-            out.append(t)
-        tmp = out
-        # Replace angle brackets with parentheses and prepend the processed string
-        return string_before_brackets + '__template__' + "__".join(tmp)
-
-    # Apply the regex replacement repeatedly until there are no more matches
-    while re.search(pattern, code):
-        code = re.sub(pattern, replacer, code)
-    for i,j in to_gen:
-        code = i.generate(code,j)
-    return replace_innermost_brackets(code)
-
-def handle_struct_templates(raw):
-    return replace_innermost_brackets(raw)
-
-
-def handle_modules(raw):
-    out = re.search(r'\bmodule\s+(\w*);', raw)
-    if out is None:
-        return raw
-    out = out.group(1)
-    raw = re.sub(r'\bmodule\s+(\w*);','',raw)
-    pattern = r'\b' + out + r'\s*\.\s*'
-    raw = re.sub(pattern,out + "__",raw)
-    return raw
-
-n_foreach = 0
-
-def replace_foreach(code):
-    # Pattern to match the innermost angle brackets
-    pattern = r"\bforeach\s*\((.*)\)"
-
-    if re.search(pattern,code) is None:
-        return code
-
-    to_gen = []
-    # Function to replace angle brackets with parentheses
-    def replacer(match):
-        global n_foreach
-        n_foreach += 1
-        # Extract the string before the angle brackets
-        l,r = match.group(1).split(" in ")
-        var_name = l.split(" ")[-1]
-        itername = "__iter_foreach_" + str(n_foreach)
-        out = "auto " + itername + " = __iter__(" + r + "); for(" + l + " = __start__(" + itername + "); !__done__(" + itername + "); " + var_name + " = __next__(" + itername + "))"
-        return out
-
-    # Apply the regex replacement repeatedly until there are no more matches
-    while re.search(pattern, code):
-        code = re.sub(pattern, replacer, code)
-    return replace_foreach(code)
-
-def handle_foreach(raw):
-    return replace_foreach(raw)
+def run_echo(command,echo):
+    if echo:
+        print(command)
+    os.system(command)
 
 def format_location(location):
     return "\033[1m" + location['file'] + ":" + str(location['line']) + ":" + str(location['column']) + "\033[0m"
@@ -226,20 +32,23 @@ def print_error(error):
     error_msg = format_location(error["locations"][0]['caret']) + ": " + error_msg
     print(error_msg)
 
-def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, echo = False, openmp = True):
-
+def call_c_preprocessor(inp,cxx,includes=[],echo = False, keep_temp = False):
     tmp_file = inp + "__tmp1_sgcc.tmp"
     cpp_args = ['-E',r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"include")] + includes + ['-xc',inp,'-o',tmp_file]
     cpp_call = cxx + " " + " ".join(cpp_args)
-    if echo:
-        print(cpp_call)
-    os.system(cpp_call)
+
+    run_echo(cpp_call,echo)
 
     with open(tmp_file,"r") as f:
         raw = f.read()
 
+    if not keep_temp:
+        os.remove(tmp_file)
+
+    return raw
+
+def preprocess_file(raw,echo = False):
     before = raw
-    count = 0
     while True:
         raw = handle_modules(raw)
         raw = handle_templates(raw)
@@ -250,15 +59,14 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
             break
         before = raw
     raw = "#define __generate(...) \n #define bool _Bool \n #define true ((_Bool)1) \n #define false ((_Bool)0) \n" + raw
+    return raw
 
+def parse_string(raw,cxx,inp,keep_temp):
+    tmp_file = inp + "__tmp2_sgcc.tmp"
+    
     with open(tmp_file,"w") as f:
         f.write(raw)
 
-    #exit()
-    
-    #ast = parse_file(inp, use_cpp=True,
-    #    cpp_path='gcc-13',
-    #    cpp_args=['-E',r'-I' + os.path.join(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')),"include")] + includes + ['-xc'])
     try:
         ast = parse_file(tmp_file, use_cpp=True, cpp_path=cxx,cpp_args=['-E','-xc'])
     except ParseError as e:
@@ -270,24 +78,18 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
             os.remove(tmp_file)
         except:
             pass
-    
-    generator = c_generator.CGenerator()
 
-    #ast.show(offset = 2)
+    return ast
 
-    v = KernelFixer()
-    v.visit(ast)
-
-    #exit()
-
-    out = generator.visit(ast)
-
-    with open(os.path.join(os.path.dirname( __file__ ),"ops.hpp"),"r") as ops:
+def append_ops(out,ops_name = "ops.hpp"):
+    with open(os.path.join(os.path.dirname( __file__ ),ops_name),"r") as ops:
         out = ops.read() + out + """\ntemplate<typename T>
 static inline const char* to_str(T in){
     return __str__(in);
 }\n"""
+    return out
 
+def call_cxx(out,outfile,echo,openmp,O,keep_temp,cxx):
     temp_file = outfile.split(".")[0] + "__sgc_tmp.cpp"
 
     with open(temp_file,"w") as f:
@@ -300,21 +102,34 @@ static inline const char* to_str(T in){
         command += " -fopenmp"
     command += " > /dev/null 2> " + error_file
 
-    if (echo):
-        print(command)
-
-    os.system(command)
+    run_echo(command,echo)
 
     with open(error_file,"r") as f:
         errors = f.read()
     os.remove(error_file)
 
-    errors = json.loads(errors)
-    for i in errors:
-        print_error(i)
-    #print(errors)
-    #print(json.loads(errors))
-    #print(type(errors))
+    if errors.strip() == "error: invalid value 'json' in '-fdiagnostics-format json'":
+        command = cxx + " -O" + str(O) + " " + " -c " + temp_file + " -o " + outfile + " -Wno-c++11-extensions"
+        if (openmp):
+            command += " -fopenmp"
+        command += " > /dev/null 2> " + error_file
+
+        if (echo):
+            print(command)
+
+        os.system(command)
+
+        with open(error_file,"r") as f:
+            errors = f.read()
+        os.remove(error_file)
+
+
+    try:
+        errors = json.loads(errors)
+        for i in errors:
+            print_error(i)
+    except:
+        print(errors)
 
     if (not keep_temp):
         try:
@@ -322,21 +137,48 @@ static inline const char* to_str(T in){
         except:
             pass
     
+    return errors
+    
+def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, echo = False, openmp = True):
+
+    reset_generated()
+
+    raw = call_c_preprocessor(inp,cxx,includes=includes,echo=echo,keep_temp=keep_temp)
+
+    raw = preprocess_file(raw,echo=echo)
+
+    ast = parse_string(raw,cxx=cxx,inp=inp,keep_temp=keep_temp)
+    
+    generator = c_generator.CGenerator()
+
+    KernelFixer().visit(ast)
+
+    out = generator.visit(ast)
+
+    out = append_ops(out)
+
+    errors = call_cxx(out,outfile=outfile,echo=echo,openmp=openmp,O=O,keep_temp=keep_temp,cxx=cxx)
+
     return len(errors)
 
 if __name__ == "__main__":
+
+    default_cxx = os.getenv('SGCC_CXX')
+    if default_cxx is None:
+        default_cxx = "g++"
+
     parser = argparse.ArgumentParser(description="Compile .sgc")
     parser.add_argument('files',metavar="<source>",type=str, nargs='+')
     parser.add_argument('-o',metavar="<output>",type=str,default="a.out")
-    parser.add_argument('-cxx',metavar="<cxx>",type=str,default="g++-13")
+    parser.add_argument('-cxx',metavar="<cxx>",type=str,default="none")
     parser.add_argument('-c',action='store_true',default=False)
     parser.add_argument('-O',metavar="<opt>",type=int,default=3)
     parser.add_argument('--echo',action='store_true',default=False)
-    parser.add_argument('-I',metavar="<I>",type=str,nargs='+',action="append")
-    parser.add_argument('-L',metavar="<L>",type=str,nargs='+',action="append")
-    parser.add_argument('-l',metavar="<l>",type=str,nargs='+',action="append")
-    parser.add_argument('-framework',metavar="<framework>",type=str,nargs='+',action="append")
-    parser.add_argument('--no-parallel',action='store_true',default=False)
+    parser.add_argument('-I',metavar="<I>",type=str,action="append")
+    parser.add_argument('-L',metavar="<L>",type=str,action="append")
+    parser.add_argument('-l',metavar="<l>",type=str,action="append")
+    parser.add_argument('-framework',metavar="<framework>",type=str,action="append")
+    parser.add_argument('--parallel',action='store_true',default=True)
     parser.add_argument('--save-temps','-S',action='store_true',default=False)
 
     args = parser.parse_args()
@@ -349,35 +191,39 @@ if __name__ == "__main__":
     links = []
     frameworks = []
     try:
-        includes = ["-I" + i[0] for i in args.I]
+        includes = ["-I" + i for i in args.I]
     except:
         pass
     try:
-        link_dir = ["-L" + i[0] for i in args.L]
+        link_dir = ["-L" + i for i in args.L]
     except:
         pass
     try:
-        links = ["-l" + i[0] for i in args.l]
+        links = ["-l" + i for i in args.l]
     except:
         pass
     try:
-        frameworks = ["-framework " + i[0] for i in args.framework]
+        frameworks = ["-framework " + i for i in args.framework]
     except:
         pass
 
+    cxx = args.cxx
+    if cxx == "none":
+        cxx = find_compiler(args.echo)
+
     if (args.c):
-        compile_file(to_compile[0],args.o,includes,O = args.O,cxx = args.cxx,keep_temp = args.save_temps, echo = args.echo, openmp = not args.no_parallel)
+        compile_file(to_compile[0],args.o,includes,O = args.O,cxx = cxx,keep_temp = args.save_temps, echo = args.echo, openmp = not args.parallel)
 
     else:
         intermediate_outputs = [i.split(".")[0] + "__tmp.o" for i in to_compile]
         
         for i,j in zip(to_compile,intermediate_outputs):
-            if compile_file(i,j,includes,O = args.O,cxx = args.cxx,keep_temp = args.save_temps, echo = args.echo, openmp = not args.no_parallel) != 0:
+            if compile_file(i,j,includes,O = args.O,cxx = cxx,keep_temp = args.save_temps, echo = args.echo, openmp = not args.parallel) != 0:
                 exit()
 
-        link_command = args.cxx + " -o " + args.o + " -O" + str(args.O) + " " + " ".join(intermediate_outputs + to_link) + " " + " ".join(includes + link_dir + links + frameworks)
+        link_command = cxx + " -o " + args.o + " -O" + str(args.O) + " " + " ".join(intermediate_outputs + to_link) + " " + " ".join(includes + link_dir + links + frameworks)
 
-        if (not args.no_parallel):
+        if (not args.parallel):
             link_command += " -fopenmp"
 
         if (args.echo):
