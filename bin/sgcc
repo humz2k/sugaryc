@@ -89,7 +89,7 @@ static inline const char* to_str(T in){
 }\n"""
     return out
 
-def call_cxx(out,outfile,echo,openmp,O,keep_temp,cxx):
+def call_cxx(out,outfile,echo,openmp,O,keep_temp,cxx, warnings):
     temp_file = outfile.split(".")[0] + "__sgc_tmp.cpp"
 
     with open(temp_file,"w") as f:
@@ -97,7 +97,9 @@ def call_cxx(out,outfile,echo,openmp,O,keep_temp,cxx):
 
     error_file = "__sgc_errors" + temp_file.replace("/","_") + ".json"
 
-    command = cxx + " -O" + str(O) + " " + " -c " + temp_file + " -o " + outfile + " -Wno-c++11-extensions -fdiagnostics-format=json"
+    warnings = " ".join(warnings)
+
+    command = cxx + " -O" + str(O) + " " + " -c " + temp_file + " -o " + outfile + " -Wno-c++11-extensions -fdiagnostics-format=json " + warnings
     if (openmp):
         command += " -fopenmp"
     command += " > /dev/null 2> " + error_file
@@ -109,7 +111,7 @@ def call_cxx(out,outfile,echo,openmp,O,keep_temp,cxx):
     os.remove(error_file)
 
     if errors.strip() == "error: invalid value 'json' in '-fdiagnostics-format json'":
-        command = cxx + " -O" + str(O) + " " + " -c " + temp_file + " -o " + outfile + " -Wno-c++11-extensions"
+        command = cxx + " -O" + str(O) + " " + " -c " + temp_file + " -o " + outfile + " -Wno-c++11-extensions " + warnings
         if (openmp):
             command += " -fopenmp"
         command += " > /dev/null 2> " + error_file
@@ -139,7 +141,7 @@ def call_cxx(out,outfile,echo,openmp,O,keep_temp,cxx):
     
     return errors
     
-def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, echo = False, openmp = True):
+def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, echo = False, openmp = True, warnings = []):
 
     reset_generated()
 
@@ -157,7 +159,7 @@ def compile_file(inp,outfile,includes=[],O=1,cxx = "g++", keep_temp = False, ech
 
     out = append_ops(out)
 
-    errors = call_cxx(out,outfile=outfile,echo=echo,openmp=openmp,O=O,keep_temp=keep_temp,cxx=cxx)
+    errors = call_cxx(out,outfile=outfile,echo=echo,openmp=openmp,O=O,keep_temp=keep_temp,cxx=cxx, warnings = warnings)
 
     return len(errors)
 
@@ -177,6 +179,7 @@ if __name__ == "__main__":
     parser.add_argument('-I',metavar="<I>",type=str,action="append")
     parser.add_argument('-L',metavar="<L>",type=str,action="append")
     parser.add_argument('-l',metavar="<l>",type=str,action="append")
+    parser.add_argument('-W',metavar="<warnings>",type=str,action="append")
     parser.add_argument('-framework',metavar="<framework>",type=str,action="append")
     parser.add_argument('--parallel',action='store_true',default=True)
     parser.add_argument('--save-temps','-S',action='store_true',default=False)
@@ -190,6 +193,7 @@ if __name__ == "__main__":
     link_dir = []
     links = []
     frameworks = []
+    warnings = []
     try:
         includes = ["-I" + i for i in args.I]
     except:
@@ -206,19 +210,23 @@ if __name__ == "__main__":
         frameworks = ["-framework " + i for i in args.framework]
     except:
         pass
+    try:
+        warnings = ["-W" + i for i in args.W]
+    except:
+        pass
 
     cxx = args.cxx
     if cxx == "none":
         cxx = find_compiler(args.echo)
 
     if (args.c):
-        compile_file(to_compile[0],args.o,includes,O = args.O,cxx = cxx,keep_temp = args.save_temps, echo = args.echo, openmp = not args.parallel)
+        compile_file(to_compile[0],args.o,includes,O = args.O,cxx = cxx,keep_temp = args.save_temps, echo = args.echo, openmp = not args.parallel, warnings = warnings)
 
     else:
         intermediate_outputs = [i.split(".")[0] + "__tmp.o" for i in to_compile]
         
         for i,j in zip(to_compile,intermediate_outputs):
-            if compile_file(i,j,includes,O = args.O,cxx = cxx,keep_temp = args.save_temps, echo = args.echo, openmp = not args.parallel) != 0:
+            if compile_file(i,j,includes,O = args.O,cxx = cxx,keep_temp = args.save_temps, echo = args.echo, openmp = not args.parallel, warnings = warnings) != 0:
                 exit()
 
         link_command = cxx + " -o " + args.o + " -O" + str(args.O) + " " + " ".join(intermediate_outputs + to_link) + " " + " ".join(includes + link_dir + links + frameworks)

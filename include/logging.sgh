@@ -1,0 +1,38 @@
+#ifndef _LOGGING_SGH_
+#define _LOGGING_SGH_
+
+#include <stdlib.sgh>
+
+#define set static int
+
+static inline void log_base(string log_str){
+
+    generated turn_on_debug_mode<T>{
+        println(log_str);
+    }
+
+};
+
+#define logs_on turn_on_debug_mode<T>
+
+static inline void log<info>(string log_str){
+    log_base("\033[1;0mINFO: \033[0;0m" + log_str);
+}
+
+static inline void log<warn>(string log_str){
+    log_base("\033[1;33mWARNING: \033[0;33m" + log_str + "\033[0;0m");
+}
+
+static inline void log<error>(string log_str){
+    log_base("\033[1;31mERROR: \033[0;31m" + log_str + "\033[0;0m");
+
+    generated turn_off_log_exit_mode<T>{
+        log<warn>("not exiting (dont_exit_on_log_error set)");
+        return;
+    }
+    exit(1);
+}
+
+#define dont_exit_on_log_error turn_off_log_exit_mode<T>
+
+#endif
