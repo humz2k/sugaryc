@@ -165,3 +165,6 @@ bin/ref_counter.cpp
 cstdlib/*.h
 
 .DS_Store
+
+pycparser/lextab.py
+pycparser/yacctab.py
