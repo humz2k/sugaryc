@@ -11,15 +11,17 @@ See `docs` (https://github.com/humz2k/sugaryc/tree/main/docs) for documentation.
 ### Building
 You need `python3` and a C++ compiler installed (preferably `gcc-13/g++-13`). 
 
-Set the environment variable `SGCC_CXX` to your C++ compiler of choice (e.g. `export SGCC_CXX="g++-13"`).
+1. Set the environment variable `SGCC_CXX` to your C++ compiler of choice (e.g. `export SGCC_CXX="g++-13"`).
 
-First, build the gc with `chmod +x build_gc.sh; ./build_gc.sh`.
+2. Add `bin` to path (e.g. `export PATH="/path/to/sugaryc/bin:$PATH"`)
 
-Then, run `chmod +x build.sh; ./build.sh` to build the standard library, header files and pycparser scripts.
+3. Build the gc with `chmod +x build_gc.sh; ./build_gc.sh`.
+
+4. Run `chmod +x build.sh; ./build.sh` to build the standard library, header files and pycparser scripts.
 
 ### Using the compiler
 
-Add `bin` to path, then compile with `sgcc`. For example, `sgcc my_file.sgc -o a.out`. If you don't have `g++-13` (and haven't set `SGCC_CXX`) then specify another C++ compiler with `sgcc my_file.sgc -o a.out -cxx my_compiler`. `sgcc` uses some `gcc` extensions, so you will probably need to use some version of `gcc`.
+Make sure `bin` is added to path, then compile with `sgcc`. For example, `sgcc my_file.sgc -o a.out`. If you don't have `g++-13` (and haven't set `SGCC_CXX`) then specify another C++ compiler with `sgcc my_file.sgc -o a.out -cxx my_compiler`. `sgcc` uses some `gcc` extensions, so you will probably need to use some version of `gcc`.
 
 `usage: sgcc [-h] [-o <output>] [-cxx <cxx>] [-c] [-O <opt>] [--echo] [-I <I> [<I> ...]] [-L <L> [<L> ...]] [-l <l> [<l> ...]] [--no-parallel] [--save-temps] <source> [<source> ...]`
 
