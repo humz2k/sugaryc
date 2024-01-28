@@ -32,6 +32,8 @@ int main(){
     auto obj = make(my_object);
     obj.set_a(10);
     println("a =",obj.get_a());
+    set_a(obj,5);
+    println("a =",get_a(obj));
     println(obj);
     return 0;
 }
