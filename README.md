@@ -9,7 +9,7 @@ See `docs` (https://github.com/humz2k/sugaryc/tree/main/docs) for documentation.
 ## Getting Started
 
 ### Building
-You need `python3` and `gcc/g++` installed (preferably `gcc-13/g++-13`).
+You need `python3` and a C++ compiler installed (preferably `gcc-13/g++-13`). Set the environment variable `SGCC_CXX` to your C++ compiler of choice (e.g. `export SGCC_CXX="g++-13"`).
 
 First, build the gc with `chmod +x build_gc.sh; ./build_gc.sh`.
 
