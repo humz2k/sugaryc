@@ -23,7 +23,30 @@ You need `python3` and a C++ compiler installed (preferably `gcc-13/g++-13`).
 
 Make sure `bin` is added to path, then compile with `sgcc`. For example, `sgcc my_file.sgc -o a.out`. If you don't have `g++-13` (and haven't set `SGCC_CXX`) then specify another C++ compiler with `sgcc my_file.sgc -o a.out -cxx my_compiler`. `sgcc` uses some `gcc` extensions, so you will probably need to use some version of `gcc`.
 
-`usage: sgcc [-h] [-o <output>] [-cxx <cxx>] [-c] [-O <opt>] [--echo] [-I <I> [<I> ...]] [-L <L> [<L> ...]] [-l <l> [<l> ...]] [--no-parallel] [--save-temps] <source> [<source> ...]`
+```
+usage: sgcc [-h] [-o <output>] [-cxx <cxx>] [-c] [-O <opt>] [--echo] [-I <I>] [-L <L>] [-l <l>] [-W <warnings>] [-framework <framework>] [--parallel] [--save-temps]
+            <source> [<source> ...]
+
+Compile .sgc
+
+positional arguments:
+  <source>
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o <output>
+  -cxx <cxx>
+  -c
+  -O <opt>
+  --echo
+  -I <I>
+  -L <L>
+  -l <l>
+  -W <warnings>
+  -framework <framework>
+  --parallel
+  --save-temps, -S
+```
 
 ### Hello world
 In C, hello world looks like:
