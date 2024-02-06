@@ -3,6 +3,7 @@
 #include <stdlib.sgh>
 #include "openmpi_config.sgh"
 #include <mpi.h>
+#include <np/array.sgh>
 
 module mpi;
 
@@ -29,5 +30,19 @@ int mpi.init(int* argc, char*** argv);
 int mpi.init();
 
 int mpi.finalize();
+
+template <T=np_array_types>{
+
+    int mpi.send(np.ndarray<T> arr, int dest, int tag, mpi.comm comm);
+
+    int send(np.ndarray<T> arr, int dest, int tag, mpi.comm comm);
+
+    int mpi.recv(np.ndarray<T> arr, int source, int tag, mpi.comm comm);
+
+    int recv(np.ndarray<T> arr, int source, int tag, mpi.comm comm);
+
+    int mpi.sendrecv(np.ndarray<T> sendbuf, int dest, int sendtag, np.ndarray<T> recvbuf, int source, int recvtag, mpi.comm comm);
+
+}
 
 #endif

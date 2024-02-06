@@ -12,6 +12,8 @@
 
 #define types float_types,int_types
 
+#define np_array_types types
+
 #define Shape(...) make_shape_t(_var_args_to_ptr(__VA_ARGS__),_n_var_args(__VA_ARGS__))
 
 typedef struct {
@@ -322,3 +324,4 @@ template<T = int_types>{
 }
 
 #endif
+

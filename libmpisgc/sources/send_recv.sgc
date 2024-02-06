@@ -1,0 +1,25 @@
+#include <mpi.sgh>
+
+template <T=np_array_types>{
+
+    int mpi.send(np.ndarray<T> arr, int dest, int tag, mpi.comm comm){
+        return MPI_Send(arr.raw,arr.size * sizeof(T),MPI_BYTE,dest,tag,comm.raw_comm);
+    }
+
+    int send(np.ndarray<T> arr, int dest, int tag, mpi.comm comm){
+        return mpi.send(arr,dest,tag,comm);
+    }
+
+    int mpi.recv(np.ndarray<T> arr, int source, int tag, mpi.comm comm){
+        return MPI_Recv(arr.raw,arr.size * sizeof(T),MPI_BYTE,source,tag,comm.raw_comm,MPI_STATUS_IGNORE);
+    }
+
+    int recv(np.ndarray<T> arr, int source, int tag, mpi.comm comm){
+        return mpi.recv(arr,source,tag,comm);
+    }
+
+    int mpi.sendrecv(np.ndarray<T> sendbuf, int dest, int sendtag, np.ndarray<T> recvbuf, int source, int recvtag, mpi.comm comm){
+        return MPI_Sendrecv(sendbuf.raw,sendbuf.size*sizeof(T),MPI_BYTE,dest,sendtag,recvbuf.raw,recvbuf.size*sizeof(T),MPI_BYTE,source,recvtag,comm.raw_comm,MPI_STATUS_IGNORE);
+    }
+
+}
