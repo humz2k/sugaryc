@@ -172,3 +172,4 @@
 #endif
 
 #undef c_plusplus
+#undef __cplusplus
