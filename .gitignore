@@ -170,3 +170,5 @@ pycparser/lextab.py
 pycparser/yacctab.py
 reference_counter/ref_counter.cpp
 reference_counter/ref_counter.hpp
+
+a.out

@@ -1,0 +1,33 @@
+#ifndef _SGCCMPI_H_
+#define _SGCCMPI_H_
+#include <stdlib.sgh>
+#include "openmpi_config.sgh"
+#include <mpi.h>
+
+module mpi;
+
+typedef struct{
+    MPI_Comm raw_comm;
+    int rank;
+    int size;
+} mpi.comm;
+
+int comm_rank(mpi.comm comm);
+
+int comm_size(mpi.comm comm);
+
+int mpi.comm_rank(mpi.comm comm);
+
+int mpi.comm_size(mpi.comm comm);
+
+mpi.comm mpi.get_comm_world(void);
+
+extern mpi.comm mpi.comm_world;
+
+int mpi.init(int* argc, char*** argv);
+
+int mpi.init();
+
+int mpi.finalize();
+
+#endif

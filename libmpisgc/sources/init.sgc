@@ -1,0 +1,15 @@
+#include <mpi.sgh>
+
+int mpi.init(int* argc, char*** argv){
+    int out = MPI_Init(argc,argv);
+    mpi.comm_world = mpi.get_comm_world();
+    return out;
+}
+
+int mpi.init(){
+    return mpi.init(NULL,NULL);
+}
+
+int mpi.finalize(){
+    return MPI_Finalize();
+}

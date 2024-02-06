@@ -1,0 +1,29 @@
+#include <mpi.sgh>
+
+int comm_rank(mpi.comm comm){
+    int out; MPI_Comm_rank(comm.raw_comm,&out);
+    return out;
+}
+
+int comm_size(mpi.comm comm){
+    int out; MPI_Comm_size(comm.raw_comm,&out);
+    return out;
+}
+
+int mpi.comm_rank(mpi.comm comm){
+    return comm.comm_rank();
+}
+
+int mpi.comm_size(mpi.comm comm){
+    return comm.comm_size();
+}
+
+mpi.comm mpi.get_comm_world(void){
+    mpi.comm out;
+    out.raw_comm = MPI_COMM_WORLD;
+    MPI_Comm_rank(out.raw_comm,&out.rank);
+    MPI_Comm_size(out.raw_comm,&out.size);
+    return out;
+}
+
+mpi.comm mpi.comm_world;

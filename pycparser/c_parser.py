@@ -1696,7 +1696,7 @@ class CParser(PLYParser):
             #if (p[2] == "="):
             #    p[0] = c_ast.Assignment(p[2], p[1], p[3], p[1].coord)
             #    return
-            
+
             op = p[2][:-1]
             if (op in DUNDER_METHODS):
                 func_name = c_ast.ID(DUNDER_METHODS[op], self._token_coord(p, 2))
@@ -1767,6 +1767,18 @@ class CParser(PLYParser):
         else:
             #print("BINOP",p[2])
             if (p[2] in DUNDER_METHODS):
+                if type(p[1]) == c_ast.Constant and type(p[3]) == c_ast.Constant:
+                    if (p[1].type == 'int') and (p[3].type == 'int'):
+                        if p[2] in ['-','+']:
+                            v1 = int(p[1].value)
+                            v2 = int(p[3].value)
+
+                            if p[2] == '-':
+                                out = v1-v2
+                            elif p[2] == '+':
+                                out = v1+v2
+                            p[0] = c_ast.Constant('int',str(out),p[1].coord)
+                            return
                 func_name = c_ast.ID(DUNDER_METHODS[p[2]], self._token_coord(p, 2))
                 p[0] = c_ast.FuncCall(func_name, c_ast.ExprList([p[1],p[3]], p[1].coord), p[1].coord)
                 p[0].sugared = True
@@ -1818,7 +1830,7 @@ class CParser(PLYParser):
 
     def p_postfix_expression_2(self, p):
         """ postfix_expression  : postfix_expression LBRACKET argument_expression_list RBRACKET """
-        
+
         try:
             expr_list = p[3]
             expr_list.exprs = [p[1]] + expr_list.exprs

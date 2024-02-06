@@ -1,0 +1,174 @@
+#define OMPI_CONFIG_H
+
+/* The compiler id which OMPI was built with */
+#define OPAL_BUILD_PLATFORM_COMPILER_FAMILYID 19
+
+/* The compiler version which OMPI was built with */
+#define OPAL_BUILD_PLATFORM_COMPILER_VERSION 917504
+
+/* Define to 1 if you have the ANSI C header files. */
+//#define OPAL_STDC_HEADERS 1
+
+/* Whether your compiler has __attribute__ deprecated or not */
+#define OPAL_HAVE_ATTRIBUTE_DEPRECATED 1
+
+/* Whether your compiler has __attribute__ deprecated with the optional argument */
+#define OPAL_HAVE_ATTRIBUTE_DEPRECATED_ARGUMENT 1
+
+/* Whether you compiler has __attribute__ error or not */
+#define OPAL_HAVE_ATTRIBUTE_ERROR 1
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#define OPAL_HAVE_SYS_TIME_H 1
+
+/* Define to 1 if you have the <sys/synch.h> header file. */
+/* #undef OPAL_HAVE_SYS_SYNCH_H */
+
+/* Define to 1 if the system has the type `long long'. */
+#define OPAL_HAVE_LONG_LONG 1
+
+/* The size of a `bool', as computed by sizeof. */
+/* #undef OPAL_SIZEOF_BOOL */
+
+/* The size of a `int', as computed by sizeof. */
+/* #undef OPAL_SIZEOF_INT */
+
+/* The size of a `void*', as computed by sizeof. */
+/* #undef OPAL_SIZEOF_VOID_P */
+
+/* Maximum length of datarep string (default is 128) */
+#define OPAL_MAX_DATAREP_STRING 128
+
+/* Maximum length of error strings (default is 256) */
+#define OPAL_MAX_ERROR_STRING 256
+
+/* Maximum length of info keys (default is 36) */
+#define OPAL_MAX_INFO_KEY 36
+
+/* Maximum length of info vals (default is 256) */
+#define OPAL_MAX_INFO_VAL 256
+
+/* Maximum length of object names (default is 64) */
+#define OPAL_MAX_OBJECT_NAME 64
+
+/* Maximum length of port names (default is 1024) */
+#define OPAL_MAX_PORT_NAME 1024
+
+/* Maximum length of processor names (default is 256) */
+#define OPAL_MAX_PROCESSOR_NAME 256
+
+/* Maximum length of processor names (default is 1024) */
+#define OPAL_MAX_PSET_NAME_LEN 512
+
+/* Maximum length of from group tag (default is 256) */
+#define OPAL_MAX_STRINGTAG_LEN 1024
+
+/* The number or Fortran INTEGER in MPI Status */
+#define OMPI_FORTRAN_STATUS_SIZE 6
+
+/* Whether we have FORTRAN LOGICAL*1 or not */
+#define OMPI_HAVE_FORTRAN_LOGICAL1 1
+
+/* Whether we have FORTRAN LOGICAL*2 or not */
+#define OMPI_HAVE_FORTRAN_LOGICAL2 1
+
+/* Whether we have FORTRAN LOGICAL*4 or not */
+#define OMPI_HAVE_FORTRAN_LOGICAL4 1
+
+/* Whether we have FORTRAN LOGICAL*8 or not */
+#define OMPI_HAVE_FORTRAN_LOGICAL8 1
+
+/* Whether we have FORTRAN INTEGER*1 or not */
+#define OMPI_HAVE_FORTRAN_INTEGER1 1
+
+/* Whether we have FORTRAN INTEGER*16 or not */
+#define OMPI_HAVE_FORTRAN_INTEGER16 0
+
+/* Whether we have FORTRAN INTEGER*2 or not */
+#define OMPI_HAVE_FORTRAN_INTEGER2 1
+
+/* Whether we have FORTRAN INTEGER*4 or not */
+#define OMPI_HAVE_FORTRAN_INTEGER4 1
+
+/* Whether we have FORTRAN INTEGER*8 or not */
+#define OMPI_HAVE_FORTRAN_INTEGER8 1
+
+/* Whether we have FORTRAN REAL*16 or not */
+#define OMPI_HAVE_FORTRAN_REAL16 0
+
+/* Whether we have FORTRAN REAL*2 or not */
+#define OMPI_HAVE_FORTRAN_REAL2 0
+
+/* Whether we have FORTRAN REAL*4 or not */
+#define OMPI_HAVE_FORTRAN_REAL4 1
+
+/* Whether we have FORTRAN REAL*8 or not */
+#define OMPI_HAVE_FORTRAN_REAL8 1
+
+/* Whether in include MPI-1 compatibility */
+#define OMPI_ENABLE_MPI1_COMPAT 0
+
+/* Whether we have float _Complex  or not */
+#define HAVE_FLOAT__COMPLEX 1
+
+/* Whether we have double _Complex  or not */
+#define HAVE_DOUBLE__COMPLEX 1
+
+/* Whether we have long double _Complex  or not */
+#define HAVE_LONG_DOUBLE__COMPLEX 1
+
+/* Type of MPI_Aint */
+#define OMPI_MPI_AINT_TYPE int
+
+/* Type of MPI_Offset */
+#define OMPI_MPI_OFFSET_TYPE long long
+
+/* MPI datatype corresponding to MPI_Offset */
+#define OMPI_OFFSET_DATATYPE MPI_LONG_LONG
+
+/* Size of the MPI_Offset corresponding type */
+#define OMPI_MPI_OFFSET_SIZE 8
+
+/* Type of MPI_Count */
+#define OMPI_MPI_COUNT_TYPE long long
+
+/* type to use for ptrdiff_t, if it does not exist, set to ptrdiff_t if it does exist */
+/* #undef ptrdiff_t */
+
+/* Whether OMPI was built with parameter checking or not */
+#define OMPI_PARAM_CHECK 1
+
+/* Enable warnings in wrong usage (e.g. deprecated) in user-level code */
+#ifndef OMPI_WANT_MPI_INTERFACE_WARNING
+#define OMPI_WANT_MPI_INTERFACE_WARNING 1
+#endif
+
+/* Major, minor, and release version of Open MPI */
+#define OMPI_MAJOR_VERSION 5
+#define OMPI_MINOR_VERSION 0
+#define OMPI_RELEASE_VERSION 1
+
+/*
+ * MPI version
+ */
+#define MPI_VERSION 3
+#define MPI_SUBVERSION 1
+
+/* A  type that allows us to have sentinel type values that are still
+   valid */
+#define ompi_fortran_bogus_type_t int
+
+/* C type corresponding to FORTRAN INTEGER */
+#define ompi_fortran_integer_t int
+
+/* Whether C compiler supports -fvisibility */
+#define OPAL_C_HAVE_VISIBILITY 1
+
+#define OMPI_DECLSPEC extern
+
+#ifndef MPI_Fint
+/* MPI_Fint is the same as ompi_fortran_INTEGER_t */
+#define MPI_Fint ompi_fortran_integer_t
+#endif
+
+#undef c_plusplus
