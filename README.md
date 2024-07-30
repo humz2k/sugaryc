@@ -193,7 +193,7 @@ See `examples` for code samples.
 Idk.
 
 ### Why not just use C++?
-I don't like C++ very much.
+I like C.
 
 ### Why garbage collection?
 It makes things easy.
